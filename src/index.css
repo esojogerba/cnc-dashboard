@@ -1,0 +1,25 @@
+:root {
+  color-scheme: dark;
+  font-family: 'Roboto', sans-serif;
+  background-color: #0f1116;
+  color: #e7e9ee;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #1b1e27 0%, #0f1116 55%, #0c0e13 100%);
+  color: inherit;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
