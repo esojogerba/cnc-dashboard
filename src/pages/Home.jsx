@@ -1,6 +1,5 @@
 import ActivityFeed from '../components/ActivityFeed'
 import BotSection from '../components/BotSection'
-import Navbar from '../components/Navbar'
 import ScreenshotPanel from '../components/ScreenshotPanel'
 import StatCard from '../components/StatCard'
 
@@ -127,43 +126,40 @@ const scraperRows = [
 
 function Home() {
   return (
-    <div className="app">
-      <Navbar />
-      <main className="dashboard">
-        <section className="stats-grid">
-          {stats.map((stat) => (
-            <StatCard key={stat.label} {...stat} />
-          ))}
-        </section>
+    <main className="dashboard">
+      <section className="stats-grid">
+        {stats.map((stat) => (
+          <StatCard key={stat.label} {...stat} />
+        ))}
+      </section>
 
-        <section className="activity-grid">
-          <ActivityFeed items={activityItems} />
-          <ScreenshotPanel items={screenshotItems} />
-        </section>
+      <section className="activity-grid">
+        <ActivityFeed items={activityItems} />
+        <ScreenshotPanel items={screenshotItems} />
+      </section>
 
-        <section className="bot-area">
-          <h1 className="page-title">Active Bots</h1>
-          <BotSection
-            title="Scouters"
-            accent="peach"
-            rows={scouterRows}
-            newLabel="New Scouter"
-          />
-          <BotSection
-            title="Listers"
-            accent="gold"
-            rows={listerRows}
-            newLabel="New Lister"
-          />
-          <BotSection
-            title="Scrapers"
-            accent="lilac"
-            rows={scraperRows}
-            newLabel="New Scraper"
-          />
-        </section>
-      </main>
-    </div>
+      <section className="bot-area">
+        <h1 className="page-title">Active Bots</h1>
+        <BotSection
+          title="Scouters"
+          accent="peach"
+          rows={scouterRows}
+          newLabel="New Scouter"
+        />
+        <BotSection
+          title="Listers"
+          accent="gold"
+          rows={listerRows}
+          newLabel="New Lister"
+        />
+        <BotSection
+          title="Scrapers"
+          accent="lilac"
+          rows={scraperRows}
+          newLabel="New Scraper"
+        />
+      </section>
+    </main>
   )
 }
 
