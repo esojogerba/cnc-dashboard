@@ -63,12 +63,18 @@
     padding: 0.45rem 0.8rem;
     border-radius: 10px;
     font-size: 0.95rem;
+    text-decoration: none;
     cursor: pointer;
 }
 
 .nav-link.active {
     color: #ffffff;
     background: #353948;
+}
+
+.nav-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .dashboard {
@@ -94,6 +100,299 @@
     align-items: center;
     min-height: 84px;
     box-shadow: 0 10px 20px rgba(10, 12, 18, 0.35);
+}
+
+.stat-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.stat-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+}
+
+.stat-card-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.stat-meta {
+    margin: 0;
+    color: #9ca2b2;
+    font-size: 0.8rem;
+}
+
+.stat-title {
+    margin: 0;
+    color: #aeb3c1;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.stat-card-range,
+.stat-card-stack {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.1rem;
+    min-height: 148px;
+}
+
+.stat-card-range .stat-card-main,
+.stat-card-stack .stat-card-main {
+    align-items: flex-end;
+}
+
+.stat-card-top-spacer {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #2d313d;
+    visibility: hidden;
+}
+
+.stat-menu {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.stat-menu-button {
+    border: none;
+    background: #2d313d;
+    color: #c9cedb;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.stat-menu-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 230px;
+    background: #1b1f29;
+    border: 1px solid #2f3441;
+    border-radius: 12px;
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    box-shadow: 0 12px 28px rgba(10, 12, 18, 0.4);
+    z-index: 5;
+}
+
+.stat-menu-title {
+    margin: 0;
+    color: #e7e9ee;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stat-menu-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    color: #aeb3c1;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-menu-field input {
+    background: #11141b;
+    border: 1px solid #2f3441;
+    border-radius: 8px;
+    padding: 0.4rem 0.5rem;
+    color: #e7e9ee;
+    font-size: 0.85rem;
+}
+
+.stat-menu-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.stat-menu-apply {
+    background: #353b49;
+    border: 1px solid #3f4656;
+    color: #f0f2f7;
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.stat-icon-large {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #2d313d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c9cedb;
+    font-size: 1.3rem;
+}
+
+.scouters-stats .stat-card {
+    padding: 1.2rem 1.4rem;
+}
+
+.scouters-stats .stat-value {
+    font-size: 2.15rem;
+    letter-spacing: 0.01em;
+}
+
+.scouters-stats .stat-label {
+    font-size: 0.88rem;
+}
+
+.scouters-stats .stat-meta {
+    font-size: 0.78rem;
+}
+
+.launch-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.launch-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.launch-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.launch-header p {
+    margin: 0.35rem 0 0;
+    color: #9ca2b2;
+    font-size: 0.9rem;
+}
+
+.launch-badge {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    background: #1b1f29;
+    border: 1px solid #2f3441;
+    color: #c9cedb;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.launch-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.4rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.form-field span {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9ca2b2;
+}
+
+.launch-form input,
+.launch-form select,
+.launch-form textarea {
+    background: #1b1f29;
+    border: 1px solid #2f3441;
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    color: #e7e9ee;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.launch-form input:focus,
+.launch-form select:focus,
+.launch-form textarea:focus {
+    outline: 1px solid #3f4656;
+    border-color: #3f4656;
+}
+
+.launch-form textarea {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.input-suffix {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.input-suffix input {
+    flex: 1;
+    min-width: 0;
+    padding-right: 0.75rem;
+}
+
+.input-suffix span {
+    position: static;
+    transform: none;
+    color: #8f96a7;
+    font-size: 0.85rem;
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 0.45rem 0.55rem;
+    border-radius: 10px;
+    border: 1px solid #2f3441;
+    background: #1b1f29;
+    pointer-events: none;
+}
+
+.field-span-2 {
+    grid-column: 1 / -1;
+}
+
+.launch-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.3rem;
+}
+
+.run-button {
+    background: #86dfa0;
+    color: #14171f;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.8rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.run-button:disabled {
+    background: #2d313d;
+    color: #8f96a7;
+    cursor: not-allowed;
 }
 
 .stat-label {
@@ -447,6 +746,10 @@
         grid-template-columns: 1fr;
     }
 
+    .launch-form {
+        grid-template-columns: 1fr;
+    }
+
     .bot-table-header,
     .bot-row {
         grid-template-columns: 2fr 1.1fr 1fr 0.9fr 2fr;
@@ -572,6 +875,19 @@
 @media (max-width: 520px) {
     .dashboard {
         padding: 1.5rem 1.2rem 3rem;
+    }
+
+    .launch-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .launch-actions {
+        justify-content: stretch;
+    }
+
+    .run-button {
+        width: 100%;
     }
 
     .stats-grid {
