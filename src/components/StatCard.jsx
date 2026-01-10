@@ -5,7 +5,6 @@ function StatCard({
   value,
   accent,
   meta,
-  icon = 'open_in_new',
   variant = 'default',
   showMenu = false,
 }) {
@@ -79,9 +78,15 @@ function StatCard({
             <p className={`stat-value accent-${accent}`}>{value}</p>
             {meta ? <p className="stat-meta">{meta}</p> : null}
           </div>
-          <div className="stat-icon stat-icon-large" aria-hidden="true">
-            <span className="material-icons-round">{icon}</span>
-          </div>
+          <button
+            className="stat-icon stat-icon-large stat-icon-button"
+            type="button"
+            aria-label={`View ${label} details`}
+          >
+            <span className="material-icons-round" aria-hidden="true">
+              open_in_new
+            </span>
+          </button>
         </div>
       </article>
     )
@@ -94,9 +99,15 @@ function StatCard({
         <p className={`stat-value accent-${accent}`}>{value}</p>
         {meta ? <p className="stat-meta">{meta}</p> : null}
       </div>
-      <div className="stat-icon" aria-hidden="true">
-        <span className="material-icons-round">{icon}</span>
-      </div>
+      <button
+        className="stat-icon stat-icon-button"
+        type="button"
+        aria-label={`View ${label} details`}
+      >
+        <span className="material-icons-round" aria-hidden="true">
+          open_in_new
+        </span>
+      </button>
     </article>
   )
 }

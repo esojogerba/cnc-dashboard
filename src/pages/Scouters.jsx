@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RunsList from "../components/RunsList";
 import StatCard from "../components/StatCard";
 import StatToggleCard from "../components/StatToggleCard";
 
@@ -33,6 +34,53 @@ const savedLists = [
         ],
     },
 ];
+const runSummaries = [
+    {
+        id: "run-0920",
+        label: "Morning clearance run",
+        passed: 12,
+        avgDiscount: "24.6%",
+        gambles: 3,
+        stores: 6,
+        bought: 4,
+    },
+    {
+        id: "run-0921",
+        label: "Lunch rush scan",
+        passed: 7,
+        avgDiscount: "19.2%",
+        gambles: 2,
+        stores: 4,
+        bought: 1,
+    },
+    {
+        id: "run-0922",
+        label: "After hours test",
+        passed: 18,
+        avgDiscount: "27.8%",
+        gambles: 5,
+        stores: 8,
+        bought: 6,
+    },
+    {
+        id: "run-0923",
+        label: "Weekend sweep",
+        passed: 9,
+        avgDiscount: "21.1%",
+        gambles: 1,
+        stores: 5,
+        bought: 2,
+    },
+    {
+        id: "run-0924",
+        label: "Quick spot check",
+        passed: 4,
+        avgDiscount: "16.5%",
+        gambles: 0,
+        stores: 3,
+        bought: 0,
+    },
+];
 
 function Scouters() {
     const [tripName, setTripName] = useState("");
@@ -64,38 +112,34 @@ function Scouters() {
             <h1 className="page-title">Scouters</h1>
 
             <section className="stats-grid scouters-stats">
-                <StatToggleCard
-                    label="Items Found"
-                    value={itemsFound.value}
-                    note={itemsFound.note}
-                    accent="mint"
-                    icon="travel_explore"
-                />
-                <StatToggleCard
-                    label="Estimated Sales Profit"
-                    value={profit.value}
-                    note={profit.note}
-                    accent="gold"
-                    icon="paid"
-                />
-                <StatCard
-                    label="Avg Discount % (Bot Runs)"
-                    value="18.4%"
-                    accent="mint"
-                    meta="Across all scouter runs"
-                    icon="percent"
-                    variant="stacked"
-                    showMenu
-                />
-                <StatCard
-                    label="Avg Discount % (Receipts)"
-                    value="22.1%"
-                    accent="gold"
-                    meta="All receipts scanned"
-                    icon="percent"
-                    variant="stacked"
-                    showMenu
-                />
+        <StatToggleCard
+          label="Items Found"
+          value={itemsFound.value}
+          note={itemsFound.note}
+          accent="mint"
+        />
+        <StatToggleCard
+          label="Estimated Sales Profit"
+          value={profit.value}
+          note={profit.note}
+          accent="gold"
+        />
+        <StatCard
+          label="Avg Discount % (Bot Runs)"
+          value="18.4%"
+          accent="mint"
+          meta="Across all scouter runs"
+          variant="stacked"
+          showMenu
+        />
+        <StatCard
+          label="Avg Discount % (Receipts)"
+          value="22.1%"
+          accent="gold"
+          meta="All receipts scanned"
+          variant="stacked"
+          showMenu
+        />
             </section>
 
             <section className="panel launch-panel">
@@ -203,6 +247,19 @@ function Scouters() {
                         </button>
                     </div>
                 </form>
+            </section>
+
+            <section className="panel runs-panel">
+                <div className="runs-header">
+                    <div>
+                        <h2>Recent Runs</h2>
+                        <p>Summaries from your latest scouter sessions</p>
+                    </div>
+                    <button className="ghost-button" type="button">
+                        View all
+                    </button>
+                </div>
+                <RunsList runs={runSummaries} />
             </section>
         </main>
     );
