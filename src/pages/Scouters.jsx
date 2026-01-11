@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BotSection from "../components/BotSection";
 import RunsList from "../components/RunsList";
 import StatCard from "../components/StatCard";
 import StatToggleCard from "../components/StatToggleCard";
@@ -81,6 +82,35 @@ const runSummaries = [
         bought: 0,
     },
 ];
+const scouterRows = [
+    {
+        id: "scout-1",
+        name: "TS Scout",
+        website: "TurboSearch",
+        status: "Working",
+        runtime: "01:24:06",
+        icon: "travel_explore",
+        tone: "peach",
+    },
+    {
+        id: "scout-2",
+        name: "TS Scout",
+        website: "TurboSearch",
+        status: "Paused",
+        runtime: "01:24:06",
+        icon: "travel_explore",
+        tone: "peach",
+    },
+    {
+        id: "scout-3",
+        name: "TS Scout",
+        website: "TurboSearch",
+        status: "Error",
+        runtime: "01:24:06",
+        icon: "travel_explore",
+        tone: "peach",
+    },
+];
 
 function Scouters() {
     const [tripName, setTripName] = useState("");
@@ -109,7 +139,14 @@ function Scouters() {
 
     return (
         <main className="dashboard">
-            <h1 className="page-title">Scouters</h1>
+            <div className="page-title-row">
+                <span className="icon-chip tone-peach page-title-icon">
+                    <span className="material-icons-round" aria-hidden="true">
+                        travel_explore
+                    </span>
+                </span>
+                <h1 className="page-title page-title-large">Scouters</h1>
+            </div>
 
             <section className="stats-grid scouters-stats">
         <StatToggleCard
@@ -140,6 +177,18 @@ function Scouters() {
           variant="stacked"
           showMenu
         />
+            </section>
+
+            <section className="bot-area">
+                <BotSection
+                    title="Active Bots"
+                    accent="peach"
+                    rows={scouterRows}
+                    newLabel="New Scouter"
+                    showHeader
+                    showHeaderIcon={false}
+                    showNewButton={false}
+                />
             </section>
 
             <section className="panel launch-panel">

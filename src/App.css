@@ -1169,6 +1169,33 @@
     font-weight: 700;
 }
 
+.page-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.6rem;
+}
+
+.page-title-row .page-title {
+    margin: 0;
+}
+
+.page-title-large {
+    font-size: 2.6rem;
+}
+
+.page-title-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 1.6rem;
+}
+
+.section-title {
+    margin-bottom: 0.8rem;
+    font-size: 2rem;
+}
+
 .bot-area {
     display: flex;
     flex-direction: column;
@@ -1191,6 +1218,10 @@
     margin: 0;
     font-size: 1.6rem;
     font-weight: 600;
+}
+
+.bot-title.accent-peach {
+    color: #e7e9ee;
 }
 
 .bot-table {
