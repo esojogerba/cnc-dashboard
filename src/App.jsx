@@ -2,6 +2,7 @@ import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
+import RunSummary from './pages/RunSummary'
 import Scouters from './pages/Scouters'
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/scouters" element={<Scouters />} />
+          <Route path="/runs/:id" element={<RunSummary />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </div>
