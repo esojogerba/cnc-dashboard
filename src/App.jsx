@@ -1,6 +1,7 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import ScrollManager from './components/ScrollManager'
 import Home from './pages/Home'
 import RunSummary from './pages/RunSummary'
 import Scouters from './pages/Scouters'
@@ -8,6 +9,7 @@ import Scouters from './pages/Scouters'
 function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <ScrollManager />
       <div className="app">
         <Navbar />
         <Routes>
