@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function RunsList({ runs }) {
     return (
         <div className="runs-list">
@@ -14,15 +16,15 @@ function RunsList({ runs }) {
                     <div className="runs-title" data-label="Run">
                         <div className="runs-title-row">
                             <span className="runs-label">{run.label}</span>
-                            <button
+                            <Link
                                 className="stat-icon stat-icon-button runs-link-button"
-                                type="button"
+                                to={`/runs/${run.id}`}
                                 aria-label={`Open summary for ${run.label}`}
                             >
                                 <span className="material-icons-round" aria-hidden="true">
                                     open_in_new
                                 </span>
-                            </button>
+                            </Link>
                         </div>
                         <span className="runs-id">{run.id}</span>
                     </div>
