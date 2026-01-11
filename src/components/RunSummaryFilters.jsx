@@ -1,12 +1,11 @@
 const viewOptions = [
-    { id: "walmart", label: "Walmart view" },
-    { id: "amazon", label: "Amazon view" },
-    { id: "receipt", label: "Receipt" },
+    { id: "walmart", label: "Walmart" },
+    { id: "amazon", label: "Amazon" },
 ];
 
 function RunSummaryFilters({
-    view,
-    onViewChange,
+    dataView,
+    onDataViewChange,
     filters,
     onFiltersChange,
     aisleOptions,
@@ -19,18 +18,24 @@ function RunSummaryFilters({
 
     return (
         <section className="panel run-filters">
+            <div className="filter-header">
+                <span className="material-icons-outlined" aria-hidden="true">
+                    tune
+                </span>
+                <h2>Filter</h2>
+            </div>
             <div className="filter-view">
-                <span className="filter-title">View</span>
-                <div className="view-toggle" role="group" aria-label="Summary view">
+                <span className="filter-title">Data View</span>
+                <div className="view-toggle" role="group" aria-label="Data view">
                     {viewOptions.map((option) => (
                         <button
                             key={option.id}
                             type="button"
                             className={`view-toggle-button${
-                                view === option.id ? " active" : ""
+                                dataView === option.id ? " active" : ""
                             }`}
-                            onClick={() => onViewChange(option.id)}
-                            aria-pressed={view === option.id}
+                            onClick={() => onDataViewChange(option.id)}
+                            aria-pressed={dataView === option.id}
                         >
                             {option.label}
                         </button>

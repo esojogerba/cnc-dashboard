@@ -4,6 +4,7 @@ import ReceiptPanel from "../components/ReceiptPanel";
 import RunItemCard from "../components/RunItemCard";
 import RunSummaryFilters from "../components/RunSummaryFilters";
 import RunSummarySection from "../components/RunSummarySection";
+import RunSummaryTabs from "../components/RunSummaryTabs";
 import StatCard from "../components/StatCard";
 
 const baseRunItems = {
@@ -280,7 +281,8 @@ function RunSummary() {
     const run = runDataById[id] || defaultRun;
     const runId = id || run?.id || "run";
 
-    const [view, setView] = useState("walmart");
+    const [dataView, setDataView] = useState("walmart");
+    const [sectionView, setSectionView] = useState("passed");
     const [filters, setFilters] = useState({
         minDiscount: "",
         minFloor: "",
@@ -290,9 +292,14 @@ function RunSummary() {
         fulfillment: "all",
     });
 
+    const allItems = useMemo(
+        () => [...run.passedItems, ...run.gambleItems],
+        [run.gambleItems, run.passedItems]
+    );
+
     const aisleOptions = useMemo(() => {
         const letters = new Set();
-        run.passedItems.forEach((item) => {
+        allItems.forEach((item) => {
             const aisle = (item.aisles || "").trim();
             if (!aisle || /^n\/?a$/i.test(aisle)) return;
             letters.add(aisle[0].toUpperCase());
@@ -306,11 +313,11 @@ function RunSummary() {
                 label: `Starts with ${letter}`,
             })),
         ];
-    }, [run.passedItems]);
+    }, [allItems]);
 
     const storeOptions = useMemo(() => {
         const stores = new Map();
-        run.passedItems.forEach((item) => {
+        allItems.forEach((item) => {
             const label =
                 item.storeLine ||
                 (item.storeId ? `Store #${item.storeId}` : "Store");
@@ -323,7 +330,7 @@ function RunSummary() {
                 label,
             })),
         ];
-    }, [run.passedItems]);
+    }, [allItems]);
 
     const filteredPassed = useMemo(() => {
         const minDiscount = Number.parseFloat(filters.minDiscount);
@@ -400,9 +407,84 @@ function RunSummary() {
     }, [filters, run.passedItems]);
 
     const visiblePassed = useMemo(() => {
-        if (view !== "amazon") return filteredPassed;
+        if (dataView !== "amazon") return filteredPassed;
         return filteredPassed.filter((item) => item.keepa && item.keepa.found);
-    }, [filteredPassed, view]);
+    }, [dataView, filteredPassed]);
+
+    const filteredGambles = useMemo(() => {
+        if (!run.gambleItems.length) return [];
+        const minDiscount = Number.parseFloat(filters.minDiscount);
+        const minFloor = Number.parseInt(filters.minFloor, 10);
+        const minBack = Number.parseInt(filters.minBack, 10);
+        const aisleFilter = filters.aisle;
+        const storeFilter = filters.store;
+        const fulfillmentFilter = filters.fulfillment;
+
+        return run.gambleItems.filter((item) => {
+            if (
+                Number.isFinite(minDiscount) &&
+                (!Number.isFinite(item.discountPct) ||
+                    item.discountPct < minDiscount)
+            ) {
+                return false;
+            }
+
+            const floorValue = Number(item.floor);
+            const backValue = Number(item.back);
+            if (Number.isFinite(minFloor) && Number.isFinite(minBack)) {
+                const floorOk = Number.isFinite(floorValue)
+                    ? floorValue >= minFloor
+                    : false;
+                const backOk = Number.isFinite(backValue)
+                    ? backValue >= minBack
+                    : false;
+                if (!floorOk && !backOk) return false;
+            } else if (Number.isFinite(minFloor)) {
+                if (!Number.isFinite(floorValue) || floorValue < minFloor) {
+                    return false;
+                }
+            } else if (Number.isFinite(minBack)) {
+                if (!Number.isFinite(backValue) || backValue < minBack) {
+                    return false;
+                }
+            }
+
+            const aisle = (item.aisles || "").trim();
+            const isNA = !aisle || /^n\/?a$/i.test(aisle);
+            if (aisleFilter === "na" && !isNA) return false;
+            if (aisleFilter === "has" && isNA) return false;
+            if (
+                aisleFilter.length === 1 &&
+                aisleFilter !== "all" &&
+                (!aisle || !aisle.toUpperCase().startsWith(aisleFilter))
+            ) {
+                return false;
+            }
+
+            if (storeFilter !== "all") {
+                const storeLabel =
+                    item.storeLine ||
+                    (item.storeId ? `Store #${item.storeId}` : "");
+                if (storeLabel !== storeFilter) return false;
+            }
+
+            if (fulfillmentFilter !== "all") {
+                if (!item.fulfillment) return false;
+                const pickup = item.fulfillment.pickup;
+                const delivery = item.fulfillment.delivery;
+                if (fulfillmentFilter === "pickup" && !pickup) return false;
+                if (fulfillmentFilter === "delivery" && !delivery) return false;
+                if (
+                    fulfillmentFilter === "both" &&
+                    !(pickup && delivery)
+                ) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }, [filters, run.gambleItems]);
 
     const stats = useMemo(() => {
         const passedCount = run.passedItems.length;
@@ -489,15 +571,25 @@ function RunSummary() {
             </section>
 
             <RunSummaryFilters
-                view={view}
-                onViewChange={setView}
+                dataView={dataView}
+                onDataViewChange={setDataView}
                 filters={filters}
                 onFiltersChange={setFilters}
                 aisleOptions={aisleOptions}
                 storeOptions={storeOptions}
             />
 
-            <section className="summary-grid">
+            <RunSummaryTabs
+                activeTab={sectionView}
+                onTabChange={setSectionView}
+                counts={{
+                    passed: visiblePassed.length,
+                    gambles: filteredGambles.length,
+                    receipt: run.receiptItems.length,
+                }}
+            />
+
+            {sectionView === "passed" ? (
                 <RunSummarySection
                     title="Passed Items"
                     subtitle="All items that passed the discount threshold"
@@ -514,15 +606,17 @@ function RunSummary() {
                         </p>
                     )}
                 </RunSummarySection>
+            ) : null}
 
+            {sectionView === "gambles" ? (
                 <RunSummarySection
                     title="Low/N/A Gambles"
                     subtitle="Low stock or missing aisle details"
-                    count={run.gambleItems.length}
+                    count={filteredGambles.length}
                     scroll
                 >
-                    {run.gambleItems.length ? (
-                        run.gambleItems.map((item) => (
+                    {filteredGambles.length ? (
+                        filteredGambles.map((item) => (
                             <RunItemCard key={item.id} item={item} />
                         ))
                     ) : (
@@ -531,12 +625,11 @@ function RunSummary() {
                         </p>
                     )}
                 </RunSummarySection>
-            </section>
+            ) : null}
 
-            <ReceiptPanel
-                items={run.receiptItems}
-                isActive={view === "receipt"}
-            />
+            {sectionView === "receipt" ? (
+                <ReceiptPanel items={run.receiptItems} isActive />
+            ) : null}
         </main>
     );
 }
