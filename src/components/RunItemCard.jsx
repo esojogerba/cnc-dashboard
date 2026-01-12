@@ -13,12 +13,19 @@ function RunItemCard({
     showReceiptToggle = false,
     isInReceipt = false,
     onReceiptToggle,
+    receiptQty = 1,
+    onReceiptQtyChange,
+    onReceiptQtyCommit,
 }) {
     const storeTitle =
         item.storeLine ||
         (item.storeId ? `Store #${item.storeId}` : "Store");
     const address = item.address || "Address unavailable";
     const keepaFound = Boolean(item.keepa && item.keepa.found);
+    const qtyValue =
+        receiptQty === null || receiptQty === undefined
+            ? ""
+            : String(receiptQty);
 
     const tags = [];
     if (item.pass) tags.push({ label: "Pass", tone: "pass" });
@@ -98,6 +105,28 @@ function RunItemCard({
                                     check
                                 </span>
                             </span>
+                            <input
+                                className="receipt-toggle-qty"
+                                type="number"
+                                min="1"
+                                step="1"
+                                value={qtyValue}
+                                onChange={(event) =>
+                                    onReceiptQtyChange?.(
+                                        item,
+                                        event.target.value
+                                    )
+                                }
+                                onBlur={(event) =>
+                                    onReceiptQtyCommit?.(
+                                        item,
+                                        event.target.value
+                                    )
+                                }
+                                onClick={(event) => event.stopPropagation()}
+                                onMouseDown={(event) => event.stopPropagation()}
+                                aria-label={`Quantity for ${storeTitle}`}
+                            />
                             <span className="receipt-toggle-label">
                                 {isInReceipt
                                     ? "In receipt"

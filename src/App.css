@@ -994,10 +994,28 @@
     white-space: nowrap;
 }
 
-.receipt-toggle input {
+.receipt-toggle input[type="checkbox"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
+}
+
+.receipt-toggle-qty {
+    width: 44px;
+    max-width: 100%;
+    background: #11141b;
+    border: 1px solid #2f3441;
+    border-radius: 8px;
+    padding: 0.2rem 0.35rem;
+    color: #e7e9ee;
+    font-size: 0.75rem;
+    text-align: center;
+    font-family: inherit;
+}
+
+.receipt-toggle-qty:focus {
+    outline: 1px solid #3f4656;
+    border-color: #3f4656;
 }
 
 .receipt-toggle-box {

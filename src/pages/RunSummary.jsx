@@ -278,7 +278,7 @@ const defaultRun = runDataById["run-0920"];
 
 const receiptStoragePrefix = "cnc-receipt:";
 
-const buildReceiptItem = (item) => {
+const buildReceiptItem = (item, qty = 1) => {
     const storeLine =
         item.storeLine ||
         (item.storeId ? `Store #${item.storeId}` : item.address || "Store");
@@ -295,7 +295,7 @@ const buildReceiptItem = (item) => {
         id: item.id,
         itemId: item.itemId || item.id,
         storeLine,
-        qty: 1,
+        qty: Math.max(1, Number.parseInt(qty, 10) || 1),
         unitCost,
         unitSales,
     };
@@ -334,6 +334,7 @@ function RunSummary() {
     );
     const [receiptItems, setReceiptItems] = useState([]);
     const skipReceiptSaveRef = useRef(true);
+    const [draftQtyById, setDraftQtyById] = useState({});
 
     useEffect(() => {
         skipReceiptSaveRef.current = true;
@@ -351,6 +352,16 @@ function RunSummary() {
             // Ignore storage failures (private mode, quota, etc).
         }
     }, [receiptKey, receiptItems]);
+
+    useEffect(() => {
+        setDraftQtyById((prev) => {
+            const next = { ...prev };
+            receiptItems.forEach((item) => {
+                next[item.id] = String(item.qty || 1);
+            });
+            return next;
+        });
+    }, [receiptItems]);
 
     const allItems = useMemo(
         () => [...run.passedItems, ...run.gambleItems],
@@ -574,18 +585,93 @@ function RunSummary() {
         [receiptItems]
     );
 
+    const receiptItemMap = useMemo(() => {
+        const map = new Map();
+        receiptItems.forEach((item) => {
+            map.set(item.id, item);
+        });
+        return map;
+    }, [receiptItems]);
+
     const handleReceiptToggle = (item, isSelected) => {
         setReceiptItems((prev) => {
             const exists = prev.some((entry) => entry.id === item.id);
             const shouldAdd = isSelected ?? !exists;
             if (shouldAdd && !exists) {
-                return [...prev, buildReceiptItem(item)];
+                const qty = draftQtyById[item.id] || "1";
+                return [...prev, buildReceiptItem(item, qty)];
             }
             if (!shouldAdd && exists) {
                 return prev.filter((entry) => entry.id !== item.id);
             }
             return prev;
         });
+    };
+
+    const handleReceiptQtyChange = (item, value) => {
+        setDraftQtyById((prev) => ({ ...prev, [item.id]: value }));
+        if (value === "") return;
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isFinite(parsed)) return;
+        if (parsed <= 0) {
+            setReceiptItems((prev) =>
+                prev.filter((entry) => entry.id !== item.id)
+            );
+            return;
+        }
+        const nextQty = Math.max(1, parsed);
+        setReceiptItems((prev) => {
+            if (!prev.some((entry) => entry.id === item.id)) return prev;
+            return prev.map((entry) =>
+                entry.id === item.id ? { ...entry, qty: nextQty } : entry
+            );
+        });
+    };
+
+    const handleReceiptQtyCommit = (item, value) => {
+        if (value === "") {
+            const fallbackQty = receiptItemMap.get(item.id)?.qty ?? 1;
+            setDraftQtyById((prev) => ({
+                ...prev,
+                [item.id]: String(fallbackQty),
+            }));
+            return;
+        }
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isFinite(parsed)) {
+            const fallbackQty = receiptItemMap.get(item.id)?.qty ?? 1;
+            setDraftQtyById((prev) => ({
+                ...prev,
+                [item.id]: String(fallbackQty),
+            }));
+            return;
+        }
+        if (parsed <= 0) {
+            setDraftQtyById((prev) => ({ ...prev, [item.id]: "1" }));
+            setReceiptItems((prev) =>
+                prev.filter((entry) => entry.id !== item.id)
+            );
+            return;
+        }
+        const nextQty = parsed;
+        setDraftQtyById((prev) => ({
+            ...prev,
+            [item.id]: String(nextQty),
+        }));
+        setReceiptItems((prev) => {
+            if (!prev.some((entry) => entry.id === item.id)) return prev;
+            return prev.map((entry) =>
+                entry.id === item.id ? { ...entry, qty: nextQty } : entry
+            );
+        });
+    };
+
+    const getItemQtyValue = (itemId) => {
+        if (Object.prototype.hasOwnProperty.call(draftQtyById, itemId)) {
+            return draftQtyById[itemId];
+        }
+        const receiptQty = receiptItemMap.get(itemId)?.qty;
+        return receiptQty != null ? String(receiptQty) : "1";
     };
 
     return (
@@ -686,8 +772,17 @@ function RunSummary() {
                                                 isInReceipt={receiptIds.has(
                                                     item.id
                                                 )}
+                                                receiptQty={getItemQtyValue(
+                                                    item.id
+                                                )}
                                                 onReceiptToggle={
                                                     handleReceiptToggle
+                                                }
+                                                onReceiptQtyChange={
+                                                    handleReceiptQtyChange
+                                                }
+                                                onReceiptQtyCommit={
+                                                    handleReceiptQtyCommit
                                                 }
                                             />
                                         </div>
@@ -722,8 +817,17 @@ function RunSummary() {
                                                 isInReceipt={receiptIds.has(
                                                     item.id
                                                 )}
+                                                receiptQty={getItemQtyValue(
+                                                    item.id
+                                                )}
                                                 onReceiptToggle={
                                                     handleReceiptToggle
+                                                }
+                                                onReceiptQtyChange={
+                                                    handleReceiptQtyChange
+                                                }
+                                                onReceiptQtyCommit={
+                                                    handleReceiptQtyCommit
                                                 }
                                             />
                                         </div>

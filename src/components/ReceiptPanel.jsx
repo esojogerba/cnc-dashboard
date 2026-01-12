@@ -18,6 +18,7 @@ function ReceiptPanel({
 }) {
     const safeItems = Array.isArray(items) ? items : [];
     const [localItems, setLocalItems] = useState(safeItems);
+    const [draftQtyById, setDraftQtyById] = useState({});
 
     useEffect(() => {
         if (!onItemsChange) {
@@ -34,6 +35,20 @@ function ReceiptPanel({
         }
     };
 
+    useEffect(() => {
+        setDraftQtyById((prev) => {
+            const next = {};
+            lineItems.forEach((item) => {
+                if (prev[item.id] === "") {
+                    next[item.id] = "";
+                } else {
+                    next[item.id] = String(item.qty ?? 1);
+                }
+            });
+            return next;
+        });
+    }, [lineItems]);
+
     const totalQty = lineItems.reduce(
         (sum, item) => sum + (item.qty || 0),
         0
@@ -49,7 +64,48 @@ function ReceiptPanel({
     const profit = totalSales - totalCost;
 
     const handleQtyChange = (id, value) => {
-        const nextQty = Math.max(1, Number.parseInt(value, 10) || 1);
+        setDraftQtyById((prev) => ({ ...prev, [id]: value }));
+        if (value === "") return;
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isFinite(parsed)) return;
+        if (parsed <= 0) {
+            setItems(lineItems.filter((item) => item.id !== id));
+            return;
+        }
+        const nextQty = Math.max(1, parsed);
+        setItems(
+            lineItems.map((item) =>
+                item.id === id ? { ...item, qty: nextQty } : item
+            )
+        );
+    };
+
+    const handleQtyCommit = (id, value) => {
+        const currentQty = lineItems.find((item) => item.id === id)?.qty ?? 1;
+        if (value === "") {
+            setDraftQtyById((prev) => ({
+                ...prev,
+                [id]: String(currentQty),
+            }));
+            return;
+        }
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isFinite(parsed)) {
+            setDraftQtyById((prev) => ({
+                ...prev,
+                [id]: String(currentQty),
+            }));
+            return;
+        }
+        if (parsed <= 0) {
+            setItems(lineItems.filter((item) => item.id !== id));
+            return;
+        }
+        const nextQty = Math.max(1, parsed);
+        setDraftQtyById((prev) => ({
+            ...prev,
+            [id]: String(nextQty),
+        }));
         setItems(
             lineItems.map((item) =>
                 item.id === id ? { ...item, qty: nextQty } : item
@@ -133,6 +189,12 @@ function ReceiptPanel({
                                 const lineCost = unitCost * lineQty;
                                 const lineSales = unitSales * lineQty;
                                 const lineProfit = lineSales - lineCost;
+                                const qtyValue = Object.prototype.hasOwnProperty.call(
+                                    draftQtyById,
+                                    item.id
+                                )
+                                    ? draftQtyById[item.id]
+                                    : String(item.qty ?? 1);
                                 const discountPct =
                                     unitSales > 0
                                         ? (1 - unitCost / unitSales) * 100
@@ -156,9 +218,15 @@ function ReceiptPanel({
                                                 type="number"
                                                 min="1"
                                                 step="1"
-                                                value={item.qty}
+                                                value={qtyValue}
                                                 onChange={(event) =>
                                                     handleQtyChange(
+                                                        item.id,
+                                                        event.target.value
+                                                    )
+                                                }
+                                                onBlur={(event) =>
+                                                    handleQtyCommit(
                                                         item.id,
                                                         event.target.value
                                                     )
