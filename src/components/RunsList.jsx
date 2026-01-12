@@ -10,6 +10,7 @@ function RunsList({ runs }) {
                 <span>Gambles</span>
                 <span>Total Stores</span>
                 <span>Bought</span>
+                <span />
             </div>
             {runs.map((run) => (
                 <div key={run.id} className="runs-row">
@@ -42,6 +43,20 @@ function RunsList({ runs }) {
                     </div>
                     <div className="runs-metric accent-mint" data-label="Bought">
                         {run.bought}
+                    </div>
+                    <div className="runs-action" data-label="Remove">
+                        <button
+                            className="runs-trash-button"
+                            type="button"
+                            aria-label={`Delete ${run.label}`}
+                        >
+                            <span
+                                className="material-icons-outlined"
+                                aria-hidden="true"
+                            >
+                                delete
+                            </span>
+                        </button>
                     </div>
                 </div>
             ))}
