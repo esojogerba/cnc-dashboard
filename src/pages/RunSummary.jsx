@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReceiptPanel from "../components/ReceiptPanel";
 import RunItemCard from "../components/RunItemCard";
@@ -276,6 +276,43 @@ const runDataById = {
 
 const defaultRun = runDataById["run-0920"];
 
+const receiptStoragePrefix = "cnc-receipt:";
+
+const buildReceiptItem = (item) => {
+    const storeLine =
+        item.storeLine ||
+        (item.storeId ? `Store #${item.storeId}` : item.address || "Store");
+    const unitCostRaw = Number(item.price);
+    const unitCost = Number.isFinite(unitCostRaw)
+        ? unitCostRaw
+        : Number(item.marterPrice) || 0;
+    const keepaPrice = Number(item.keepa?.price);
+    const unitSales = item.keepa?.found && Number.isFinite(keepaPrice)
+        ? keepaPrice
+        : Number(item.marterPrice) || 0;
+
+    return {
+        id: item.id,
+        itemId: item.itemId || item.id,
+        storeLine,
+        qty: 1,
+        unitCost,
+        unitSales,
+    };
+};
+
+const loadReceiptItems = (key) => {
+    if (!key) return [];
+    try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+};
+
 function RunSummary() {
     const { id } = useParams();
     const run = runDataById[id] || defaultRun;
@@ -291,6 +328,29 @@ function RunSummary() {
         store: "all",
         fulfillment: "all",
     });
+    const receiptKey = useMemo(
+        () => `${receiptStoragePrefix}${runId}`,
+        [runId]
+    );
+    const [receiptItems, setReceiptItems] = useState([]);
+    const skipReceiptSaveRef = useRef(true);
+
+    useEffect(() => {
+        skipReceiptSaveRef.current = true;
+        setReceiptItems(loadReceiptItems(receiptKey));
+    }, [receiptKey]);
+
+    useEffect(() => {
+        if (skipReceiptSaveRef.current) {
+            skipReceiptSaveRef.current = false;
+            return;
+        }
+        try {
+            localStorage.setItem(receiptKey, JSON.stringify(receiptItems));
+        } catch (error) {
+            // Ignore storage failures (private mode, quota, etc).
+        }
+    }, [receiptKey, receiptItems]);
 
     const allItems = useMemo(
         () => [...run.passedItems, ...run.gambleItems],
@@ -500,18 +560,33 @@ function RunSummary() {
                 (item) => item.storeId || item.storeLine || "Store"
             )
         ).size;
-        const boughtCount = run.receiptItems.reduce(
-            (sum, item) => sum + (item.qty || 0),
-            0
-        );
         return {
             passedCount,
             avgDiscount,
             gamblesCount: run.gambleItems.length,
             storeCount,
-            boughtCount,
+            boughtCount: receiptItems.length,
         };
-    }, [run.gambleItems, run.passedItems, run.receiptItems]);
+    }, [receiptItems.length, run.gambleItems, run.passedItems]);
+
+    const receiptIds = useMemo(
+        () => new Set(receiptItems.map((item) => item.id)),
+        [receiptItems]
+    );
+
+    const handleReceiptToggle = (item, isSelected) => {
+        setReceiptItems((prev) => {
+            const exists = prev.some((entry) => entry.id === item.id);
+            const shouldAdd = isSelected ?? !exists;
+            if (shouldAdd && !exists) {
+                return [...prev, buildReceiptItem(item)];
+            }
+            if (!shouldAdd && exists) {
+                return prev.filter((entry) => entry.id !== item.id);
+            }
+            return prev;
+        });
+    };
 
     return (
         <main className="dashboard run-summary">
@@ -586,7 +661,7 @@ function RunSummary() {
                     counts={{
                         passed: visiblePassed.length,
                         gambles: filteredGambles.length,
-                        receipt: run.receiptItems.length,
+                        receipt: receiptItems.length,
                     }}
                 />
                 <div className="summary-tabs-body">
@@ -605,7 +680,16 @@ function RunSummary() {
                                             key={item.id}
                                             className="summary-item"
                                         >
-                                            <RunItemCard item={item} />
+                                            <RunItemCard
+                                                item={item}
+                                                showReceiptToggle
+                                                isInReceipt={receiptIds.has(
+                                                    item.id
+                                                )}
+                                                onReceiptToggle={
+                                                    handleReceiptToggle
+                                                }
+                                            />
                                         </div>
                                     ))}
                                 </div>
@@ -632,7 +716,16 @@ function RunSummary() {
                                             key={item.id}
                                             className="summary-item"
                                         >
-                                            <RunItemCard item={item} />
+                                            <RunItemCard
+                                                item={item}
+                                                showReceiptToggle
+                                                isInReceipt={receiptIds.has(
+                                                    item.id
+                                                )}
+                                                onReceiptToggle={
+                                                    handleReceiptToggle
+                                                }
+                                            />
                                         </div>
                                     ))}
                                 </div>
@@ -646,9 +739,10 @@ function RunSummary() {
 
                     {sectionView === "receipt" ? (
                         <ReceiptPanel
-                            items={run.receiptItems}
+                            items={receiptItems}
                             isActive
                             embedded
+                            onItemsChange={setReceiptItems}
                         />
                     ) : null}
                 </div>

@@ -1,19 +1,65 @@
+import { useEffect, useState } from "react";
+
 const formatMoney = (value) => {
     if (value == null || !Number.isFinite(Number(value))) return "-";
     return `$${Number(value).toFixed(2)}`;
 };
 
-function ReceiptPanel({ items, isActive = false, embedded = false }) {
-    const totalQty = items.reduce((sum, item) => sum + (item.qty || 0), 0);
-    const totalCost = items.reduce(
+const formatPct = (value) => {
+    if (value == null || !Number.isFinite(Number(value))) return "-";
+    return `${Number(value).toFixed(1)}%`;
+};
+
+function ReceiptPanel({
+    items,
+    isActive = false,
+    embedded = false,
+    onItemsChange,
+}) {
+    const safeItems = Array.isArray(items) ? items : [];
+    const [localItems, setLocalItems] = useState(safeItems);
+
+    useEffect(() => {
+        if (!onItemsChange) {
+            setLocalItems(safeItems);
+        }
+    }, [onItemsChange, safeItems]);
+
+    const lineItems = onItemsChange ? safeItems : localItems;
+    const setItems = (nextItems) => {
+        if (onItemsChange) {
+            onItemsChange(nextItems);
+        } else {
+            setLocalItems(nextItems);
+        }
+    };
+
+    const totalQty = lineItems.reduce(
+        (sum, item) => sum + (item.qty || 0),
+        0
+    );
+    const totalCost = lineItems.reduce(
         (sum, item) => sum + (Number(item.unitCost) || 0) * (item.qty || 0),
         0
     );
-    const totalSales = items.reduce(
+    const totalSales = lineItems.reduce(
         (sum, item) => sum + (Number(item.unitSales) || 0) * (item.qty || 0),
         0
     );
     const profit = totalSales - totalCost;
+
+    const handleQtyChange = (id, value) => {
+        const nextQty = Math.max(1, Number.parseInt(value, 10) || 1);
+        setItems(
+            lineItems.map((item) =>
+                item.id === id ? { ...item, qty: nextQty } : item
+            )
+        );
+    };
+
+    const handleRemove = (id) => {
+        setItems(lineItems.filter((item) => item.id !== id));
+    };
 
     const panelClassName = [
         "receipt-panel",
@@ -43,7 +89,7 @@ function ReceiptPanel({ items, isActive = false, embedded = false }) {
             <div className="receipt-totals">
                 <div className="receipt-total-card">
                     <span>Items</span>
-                    <strong>{items.length}</strong>
+                    <strong>{lineItems.length}</strong>
                 </div>
                 <div className="receipt-total-card">
                     <span>Total Qty</span>
@@ -63,7 +109,7 @@ function ReceiptPanel({ items, isActive = false, embedded = false }) {
                 </div>
             </div>
 
-            {items.length ? (
+            {lineItems.length ? (
                 <div className="receipt-table-wrapper">
                     <table className="receipt-table">
                         <thead>
@@ -75,28 +121,85 @@ function ReceiptPanel({ items, isActive = false, embedded = false }) {
                                 <th className="num">Cost</th>
                                 <th className="num">Unit Sales</th>
                                 <th className="num">Sales</th>
+                                <th className="num">Profit</th>
+                                <th className="num">Remove</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {items.map((item) => (
-                                <tr key={item.id}>
-                                    <td>{item.itemId}</td>
-                                    <td>{item.storeLine}</td>
-                                    <td className="num">{item.qty}</td>
-                                    <td className="num">
-                                        {formatMoney(item.unitCost)}
-                                    </td>
-                                    <td className="num">
-                                        {formatMoney(item.unitCost * item.qty)}
-                                    </td>
-                                    <td className="num">
-                                        {formatMoney(item.unitSales)}
-                                    </td>
-                                    <td className="num">
-                                        {formatMoney(item.unitSales * item.qty)}
-                                    </td>
-                                </tr>
-                            ))}
+                            {lineItems.map((item) => {
+                                const unitCost = Number(item.unitCost) || 0;
+                                const unitSales = Number(item.unitSales) || 0;
+                                const lineQty = item.qty || 0;
+                                const lineCost = unitCost * lineQty;
+                                const lineSales = unitSales * lineQty;
+                                const lineProfit = lineSales - lineCost;
+                                const discountPct =
+                                    unitSales > 0
+                                        ? (1 - unitCost / unitSales) * 100
+                                        : null;
+
+                                return (
+                                    <tr key={item.id}>
+                                        <td>
+                                            <div className="receipt-item-cell">
+                                                <strong>{item.itemId}</strong>
+                                                <span>
+                                                    Discount{" "}
+                                                    {formatPct(discountPct)}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>{item.storeLine}</td>
+                                        <td className="num">
+                                            <input
+                                                className="receipt-qty-input"
+                                                type="number"
+                                                min="1"
+                                                step="1"
+                                                value={item.qty}
+                                                onChange={(event) =>
+                                                    handleQtyChange(
+                                                        item.id,
+                                                        event.target.value
+                                                    )
+                                                }
+                                            />
+                                        </td>
+                                        <td className="num">
+                                            {formatMoney(unitCost)}
+                                        </td>
+                                        <td className="num">
+                                            {formatMoney(lineCost)}
+                                        </td>
+                                        <td className="num">
+                                            {formatMoney(unitSales)}
+                                        </td>
+                                        <td className="num">
+                                            {formatMoney(lineSales)}
+                                        </td>
+                                        <td className="num">
+                                            {formatMoney(lineProfit)}
+                                        </td>
+                                        <td className="num">
+                                            <button
+                                                className="receipt-remove-button"
+                                                type="button"
+                                                onClick={() =>
+                                                    handleRemove(item.id)
+                                                }
+                                                aria-label={`Remove ${item.itemId}`}
+                                            >
+                                                <span
+                                                    className="material-icons-outlined"
+                                                    aria-hidden="true"
+                                                >
+                                                    delete
+                                                </span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>

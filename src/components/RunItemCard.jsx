@@ -8,7 +8,12 @@ const formatPct = (value) => {
     return `${Number(value).toFixed(1)}%`;
 };
 
-function RunItemCard({ item }) {
+function RunItemCard({
+    item,
+    showReceiptToggle = false,
+    isInReceipt = false,
+    onReceiptToggle,
+}) {
     const storeTitle =
         item.storeLine ||
         (item.storeId ? `Store #${item.storeId}` : "Store");
@@ -75,12 +80,38 @@ function RunItemCard({ item }) {
                     <h3 className="run-item-title">{storeTitle}</h3>
                     <p className="run-item-subtitle">{address}</p>
                 </div>
-                <div className="run-item-tags">
-                    {tags.map((tag) => (
-                        <span key={tag.label} className={`tag tag-${tag.tone}`}>
-                            {tag.label}
-                        </span>
-                    ))}
+                <div className="run-item-controls">
+                    {showReceiptToggle ? (
+                        <label className="receipt-toggle">
+                            <input
+                                type="checkbox"
+                                checked={isInReceipt}
+                                onChange={(event) =>
+                                    onReceiptToggle?.(item, event.target.checked)
+                                }
+                            />
+                            <span
+                                className="receipt-toggle-box"
+                                aria-hidden="true"
+                            >
+                                <span className="material-icons-outlined">
+                                    check
+                                </span>
+                            </span>
+                            <span className="receipt-toggle-label">
+                                {isInReceipt
+                                    ? "In receipt"
+                                    : "Add to receipt"}
+                            </span>
+                        </label>
+                    ) : null}
+                    <div className="run-item-tags">
+                        {tags.map((tag) => (
+                            <span key={tag.label} className={`tag tag-${tag.tone}`}>
+                                {tag.label}
+                            </span>
+                        ))}
+                    </div>
                 </div>
             </div>
 
