@@ -599,9 +599,16 @@ function RunSummary() {
                             embedded
                         >
                             {visiblePassed.length ? (
-                                visiblePassed.map((item) => (
-                                    <RunItemCard key={item.id} item={item} />
-                                ))
+                                <div className="summary-item-list">
+                                    {visiblePassed.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="summary-item"
+                                        >
+                                            <RunItemCard item={item} />
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
                                 <p className="summary-empty">
                                     No items match the current filters.
@@ -619,9 +626,16 @@ function RunSummary() {
                             embedded
                         >
                             {filteredGambles.length ? (
-                                filteredGambles.map((item) => (
-                                    <RunItemCard key={item.id} item={item} />
-                                ))
+                                <div className="summary-item-list">
+                                    {filteredGambles.map((item) => (
+                                        <div
+                                            key={item.id}
+                                            className="summary-item"
+                                        >
+                                            <RunItemCard item={item} />
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
                                 <p className="summary-empty">
                                     No gambles captured in this run.
