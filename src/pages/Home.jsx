@@ -145,6 +145,7 @@ function Home() {
           accent="peach"
           rows={scouterRows}
           newLabel="New Scouter"
+          headerLink="/scouters"
         />
         <BotSection
           title="Listers"

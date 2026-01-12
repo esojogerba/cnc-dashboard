@@ -138,7 +138,7 @@ function Scouters() {
     };
 
     return (
-        <main className="dashboard">
+        <main className="dashboard scouters-page">
             <div className="page-title-row">
                 <span className="icon-chip tone-peach page-title-icon">
                     <span className="material-icons-round" aria-hidden="true">

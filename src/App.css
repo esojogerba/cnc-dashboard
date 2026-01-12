@@ -1096,6 +1096,16 @@
     color: #aeb3c1;
 }
 
+.panel-icon-button {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.panel-icon-button:hover {
+    background: #3a3f4d;
+    color: #f0f2f7;
+}
+
 .activity-list {
     display: flex;
     flex-direction: column;
@@ -1220,7 +1230,7 @@
     font-weight: 600;
 }
 
-.bot-title.accent-peach {
+.scouters-page .bot-title.accent-peach {
     color: #e7e9ee;
 }
 
@@ -1656,6 +1666,10 @@
 @media (max-width: 520px) {
     .dashboard {
         padding: 1.5rem 1.2rem 3rem;
+    }
+
+    .top-nav {
+        padding: 1.2rem 1.2rem;
     }
 
     .launch-header {

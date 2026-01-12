@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import BotRow from './BotRow'
 
 function BotSection({
@@ -5,6 +6,7 @@ function BotSection({
   accent,
   rows,
   newLabel,
+  headerLink,
   showHeader = true,
   showHeaderIcon = true,
   showNewButton = true,
@@ -15,9 +17,21 @@ function BotSection({
         <div className="bot-header">
           <h2 className={`bot-title accent-${accent}`}>{title}</h2>
           {showHeaderIcon ? (
-            <span className="panel-icon" aria-hidden="true">
-              <span className="material-icons-round">open_in_new</span>
-            </span>
+            headerLink ? (
+              <Link
+                className="panel-icon panel-icon-button"
+                to={headerLink}
+                aria-label={`Open ${title} page`}
+              >
+                <span className="material-icons-round" aria-hidden="true">
+                  open_in_new
+                </span>
+              </Link>
+            ) : (
+              <span className="panel-icon" aria-hidden="true">
+                <span className="material-icons-round">open_in_new</span>
+              </span>
+            )
           ) : null}
         </div>
       ) : null}
