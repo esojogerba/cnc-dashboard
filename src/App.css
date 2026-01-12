@@ -867,7 +867,7 @@
 }
 
 .summary-section-body.scrollable {
-    max-height: 520px;
+    max-height: 640px;
     overflow-y: auto;
     padding-right: 0.3rem;
 }
@@ -1748,7 +1748,7 @@
     }
 
     .summary-section-body.scrollable {
-        max-height: 360px;
+        max-height: 460px;
     }
 
     .runs-row-header {
@@ -1869,7 +1869,7 @@
     }
 
     .summary-section-body.scrollable {
-        max-height: 320px;
+        max-height: min(400px, 55vh);
     }
 
     .runs-row {
