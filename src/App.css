@@ -869,7 +869,9 @@
 .summary-section-body.scrollable {
     max-height: 640px;
     overflow-y: auto;
-    padding-right: 0.3rem;
+    width: calc(100% + 2.8rem);
+    margin: 0 -1.4rem;
+    padding: 0 0.35rem 0;
 }
 
 .summary-item-list {
