@@ -787,6 +787,25 @@
     grid-column: 1 / -1;
 }
 
+.filter-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filter-reset-button {
+    width: auto;
+    justify-content: center;
+    padding: 0.45rem 1.1rem;
+    border-radius: 10px;
+}
+
+.filter-reset-button:hover:not(:disabled) {
+    background: #2a2f3a;
+    border-color: #3a3f4d;
+    color: #f0f2f7;
+}
+
 .filter-field {
     display: flex;
     flex-direction: column;

@@ -10,11 +10,28 @@ function RunSummaryFilters({
     onFiltersChange,
     aisleOptions,
     storeOptions,
+    defaultFilters = {
+        minDiscount: "30",
+        minFloor: "2",
+        minBack: "2",
+        aisle: "all",
+        store: "all",
+        fulfillment: "all",
+    },
 }) {
     const handleChange = (key) => (event) => {
         const value = event.target.value;
         onFiltersChange((prev) => ({ ...prev, [key]: value }));
     };
+
+    const handleReset = () => {
+        onFiltersChange({ ...defaultFilters });
+    };
+
+    const isResetDisabled = Object.keys(defaultFilters).every(
+        (key) =>
+            String(filters[key] ?? "") === String(defaultFilters[key] ?? "")
+    );
 
     return (
         <section className="panel run-filters">
@@ -22,11 +39,15 @@ function RunSummaryFilters({
                 <span className="material-icons-outlined" aria-hidden="true">
                     tune
                 </span>
-                <h2>Filter</h2>
+                <h2>Filters</h2>
             </div>
             <div className="filter-view">
                 <span className="filter-title">Data View</span>
-                <div className="view-toggle" role="group" aria-label="Data view">
+                <div
+                    className="view-toggle"
+                    role="group"
+                    aria-label="Data view"
+                >
                     {viewOptions.map((option) => (
                         <button
                             key={option.id}
@@ -52,7 +73,7 @@ function RunSummaryFilters({
                         step="1"
                         value={filters.minDiscount}
                         onChange={handleChange("minDiscount")}
-                        placeholder="20"
+                        placeholder="30"
                     />
                 </label>
                 <label className="filter-field">
@@ -115,6 +136,16 @@ function RunSummaryFilters({
                         <option value="both">Pickup + Delivery</option>
                     </select>
                 </label>
+            </div>
+            <div className="filter-actions">
+                <button
+                    className="ghost-button filter-reset-button"
+                    type="button"
+                    onClick={handleReset}
+                    disabled={isResetDisabled}
+                >
+                    Reset filters
+                </button>
             </div>
         </section>
     );

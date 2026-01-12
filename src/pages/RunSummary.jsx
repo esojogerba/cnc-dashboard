@@ -277,6 +277,14 @@ const runDataById = {
 const defaultRun = runDataById["run-0920"];
 
 const receiptStoragePrefix = "cnc-receipt:";
+const defaultRunFilters = {
+    minDiscount: "30",
+    minFloor: "2",
+    minBack: "2",
+    aisle: "all",
+    store: "all",
+    fulfillment: "all",
+};
 
 const buildReceiptItem = (item, qty = 1) => {
     const storeLine =
@@ -320,14 +328,7 @@ function RunSummary() {
 
     const [dataView, setDataView] = useState("walmart");
     const [sectionView, setSectionView] = useState("passed");
-    const [filters, setFilters] = useState({
-        minDiscount: "",
-        minFloor: "",
-        minBack: "",
-        aisle: "all",
-        store: "all",
-        fulfillment: "all",
-    });
+    const [filters, setFilters] = useState(defaultRunFilters);
     const receiptKey = useMemo(
         () => `${receiptStoragePrefix}${runId}`,
         [runId]
@@ -738,6 +739,7 @@ function RunSummary() {
                 onFiltersChange={setFilters}
                 aisleOptions={aisleOptions}
                 storeOptions={storeOptions}
+                defaultFilters={defaultRunFilters}
             />
 
             <section className="summary-tabs-panel">
