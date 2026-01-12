@@ -579,57 +579,66 @@ function RunSummary() {
                 storeOptions={storeOptions}
             />
 
-            <RunSummaryTabs
-                activeTab={sectionView}
-                onTabChange={setSectionView}
-                counts={{
-                    passed: visiblePassed.length,
-                    gambles: filteredGambles.length,
-                    receipt: run.receiptItems.length,
-                }}
-            />
+            <section className="summary-tabs-panel">
+                <RunSummaryTabs
+                    activeTab={sectionView}
+                    onTabChange={setSectionView}
+                    counts={{
+                        passed: visiblePassed.length,
+                        gambles: filteredGambles.length,
+                        receipt: run.receiptItems.length,
+                    }}
+                />
+                <div className="summary-tabs-body">
+                    {sectionView === "passed" ? (
+                        <RunSummarySection
+                            title="Passed Items"
+                            subtitle="All items that passed the discount threshold"
+                            count={visiblePassed.length}
+                            scroll
+                            embedded
+                        >
+                            {visiblePassed.length ? (
+                                visiblePassed.map((item) => (
+                                    <RunItemCard key={item.id} item={item} />
+                                ))
+                            ) : (
+                                <p className="summary-empty">
+                                    No items match the current filters.
+                                </p>
+                            )}
+                        </RunSummarySection>
+                    ) : null}
 
-            {sectionView === "passed" ? (
-                <RunSummarySection
-                    title="Passed Items"
-                    subtitle="All items that passed the discount threshold"
-                    count={visiblePassed.length}
-                    scroll
-                >
-                    {visiblePassed.length ? (
-                        visiblePassed.map((item) => (
-                            <RunItemCard key={item.id} item={item} />
-                        ))
-                    ) : (
-                        <p className="summary-empty">
-                            No items match the current filters.
-                        </p>
-                    )}
-                </RunSummarySection>
-            ) : null}
+                    {sectionView === "gambles" ? (
+                        <RunSummarySection
+                            title="Low/N/A Gambles"
+                            subtitle="Low stock or missing aisle details"
+                            count={filteredGambles.length}
+                            scroll
+                            embedded
+                        >
+                            {filteredGambles.length ? (
+                                filteredGambles.map((item) => (
+                                    <RunItemCard key={item.id} item={item} />
+                                ))
+                            ) : (
+                                <p className="summary-empty">
+                                    No gambles captured in this run.
+                                </p>
+                            )}
+                        </RunSummarySection>
+                    ) : null}
 
-            {sectionView === "gambles" ? (
-                <RunSummarySection
-                    title="Low/N/A Gambles"
-                    subtitle="Low stock or missing aisle details"
-                    count={filteredGambles.length}
-                    scroll
-                >
-                    {filteredGambles.length ? (
-                        filteredGambles.map((item) => (
-                            <RunItemCard key={item.id} item={item} />
-                        ))
-                    ) : (
-                        <p className="summary-empty">
-                            No gambles captured in this run.
-                        </p>
-                    )}
-                </RunSummarySection>
-            ) : null}
-
-            {sectionView === "receipt" ? (
-                <ReceiptPanel items={run.receiptItems} isActive />
-            ) : null}
+                    {sectionView === "receipt" ? (
+                        <ReceiptPanel
+                            items={run.receiptItems}
+                            isActive
+                            embedded
+                        />
+                    ) : null}
+                </div>
+            </section>
         </main>
     );
 }

@@ -3,7 +3,7 @@ const formatMoney = (value) => {
     return `$${Number(value).toFixed(2)}`;
 };
 
-function ReceiptPanel({ items, isActive = false }) {
+function ReceiptPanel({ items, isActive = false, embedded = false }) {
     const totalQty = items.reduce((sum, item) => sum + (item.qty || 0), 0);
     const totalCost = items.reduce(
         (sum, item) => sum + (Number(item.unitCost) || 0) * (item.qty || 0),
@@ -15,8 +15,16 @@ function ReceiptPanel({ items, isActive = false }) {
     );
     const profit = totalSales - totalCost;
 
+    const panelClassName = [
+        "receipt-panel",
+        !embedded && isActive ? "active" : "",
+        embedded ? "receipt-panel-embedded" : "panel",
+    ]
+        .filter(Boolean)
+        .join(" ");
+
     return (
-        <section className={`panel receipt-panel${isActive ? " active" : ""}`}>
+        <section className={panelClassName}>
             <div className="receipt-header">
                 <div>
                     <h2>Receipt</h2>

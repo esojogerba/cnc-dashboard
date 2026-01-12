@@ -1,6 +1,17 @@
-function RunSummarySection({ title, subtitle, count, children, scroll }) {
+function RunSummarySection({
+    title,
+    subtitle,
+    count,
+    children,
+    scroll,
+    embedded = false,
+}) {
+    const sectionClassName = embedded
+        ? "summary-section summary-section-embedded"
+        : "panel summary-section";
+
     return (
-        <section className="panel summary-section">
+        <section className={sectionClassName}>
             <div className="summary-section-header">
                 <div>
                     <h2>{title}</h2>
