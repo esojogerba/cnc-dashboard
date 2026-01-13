@@ -10,6 +10,7 @@ const formatPct = (value) => {
 
 function RunItemCard({
     item,
+    dataView = "walmart",
     showReceiptToggle = false,
     isInReceipt = false,
     onReceiptToggle,
@@ -22,6 +23,12 @@ function RunItemCard({
         (item.storeId ? `Store #${item.storeId}` : "Store");
     const address = item.address || "Address unavailable";
     const keepaFound = Boolean(item.keepa && item.keepa.found);
+    const keepaTitle = keepaFound ? item.keepa.title : null;
+    const isAmazonView = dataView === "amazon";
+    const headerTitle =
+        isAmazonView && keepaTitle
+            ? `${storeTitle} — ${keepaTitle}`
+            : storeTitle;
     const qtyValue =
         receiptQty === null || receiptQty === undefined
             ? ""
@@ -48,15 +55,25 @@ function RunItemCard({
         }
     }
 
-    const priceFields = [
-        { label: "Turbo price", value: formatMoney(item.price) },
-        { label: "Marter price", value: formatMoney(item.marterPrice) },
-        {
-            label: "Keepa price",
-            value: keepaFound ? formatMoney(item.keepa.price) : "-",
-        },
-        { label: "Discount", value: formatPct(item.discountPct) },
-    ];
+    const priceFields = isAmazonView
+        ? [
+              {
+                  label: "Keepa price",
+                  value: keepaFound ? formatMoney(item.keepa.price) : "-",
+              },
+              { label: "Turbo price", value: formatMoney(item.price) },
+              { label: "Discount", value: formatPct(item.discountPct) },
+              { label: "Marter price", value: formatMoney(item.marterPrice) },
+          ]
+        : [
+              { label: "Turbo price", value: formatMoney(item.price) },
+              { label: "Marter price", value: formatMoney(item.marterPrice) },
+              { label: "Discount", value: formatPct(item.discountPct) },
+              {
+                  label: "Keepa price",
+                  value: keepaFound ? formatMoney(item.keepa.price) : "-",
+              },
+          ];
 
     const stockFields = [
         { label: "Floor stock", value: item.floor ?? "-" },
@@ -65,26 +82,32 @@ function RunItemCard({
         { label: "Item ID", value: item.itemId || "-" },
     ];
 
-    const keepaFields = keepaFound
-        ? [
-              {
-                  label: "Keepa rank",
-                  value: item.keepa.rank ? `#${item.keepa.rank}` : "-",
-              },
-              {
-                  label: "Bought/mo",
-                  value: item.keepa.boughtPastMonth || "-",
-              },
-              { label: "ASIN", value: item.keepa.asin || "-" },
-              { label: "UPC", value: item.upc || "-" },
-          ]
-        : [{ label: "UPC", value: item.upc || "-" }];
+    const keepaFields = isAmazonView
+        ? keepaFound
+            ? [
+                  {
+                      label: "Keepa rank",
+                      value: item.keepa.rank ? `#${item.keepa.rank}` : "-",
+                  },
+                  {
+                      label: "Bought/mo",
+                      value: item.keepa.boughtPastMonth || "-",
+                  },
+                  { label: "ASIN", value: item.keepa.asin || "-" },
+                  { label: "UPC", value: item.upc || "-" },
+              ]
+            : [{ label: "Keepa", value: "Not found" }]
+        : [];
 
     return (
-        <article className="run-item-card">
+        <article
+            className={`run-item-card${
+                isAmazonView ? " run-item-card-amazon" : ""
+            }`}
+        >
             <div className="run-item-header">
-                <div>
-                    <h3 className="run-item-title">{storeTitle}</h3>
+                <div className="run-item-heading">
+                    <h3 className="run-item-title">{headerTitle}</h3>
                     <p className="run-item-subtitle">{address}</p>
                 </div>
                 <div className="run-item-controls">
@@ -162,14 +185,16 @@ function RunItemCard({
                 ))}
             </div>
 
-            <div className="run-item-grid run-item-grid-compact">
-                {keepaFields.map((field) => (
-                    <div key={field.label} className="run-item-field">
-                        <span>{field.label}</span>
-                        <strong>{field.value}</strong>
-                    </div>
-                ))}
-            </div>
+            {keepaFields.length ? (
+                <div className="run-item-grid run-item-grid-compact">
+                    {keepaFields.map((field) => (
+                        <div key={field.label} className="run-item-field">
+                            <span>{field.label}</span>
+                            <strong>{field.value}</strong>
+                        </div>
+                    ))}
+                </div>
+            ) : null}
 
             <div className="run-item-actions">
                 {item.walmartLink ? (

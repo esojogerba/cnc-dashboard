@@ -780,6 +780,18 @@
     box-shadow: inset 0 0 0 1px #3f4656;
 }
 
+.view-toggle-button.active.view-toggle-button-walmart {
+    background: rgba(59, 130, 246, 0.18);
+    color: #93c5fd;
+    box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.45);
+}
+
+.view-toggle-button.active.view-toggle-button-amazon {
+    background: rgba(241, 199, 118, 0.18);
+    color: #f1c776;
+    box-shadow: inset 0 0 0 1px rgba(241, 199, 118, 0.45);
+}
+
 .filter-fields {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -971,6 +983,11 @@
     gap: 1rem;
 }
 
+.run-item-heading {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
 .run-item-controls {
     display: flex;
     align-items: center;
@@ -983,6 +1000,8 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .run-item-subtitle {
@@ -1155,6 +1174,7 @@
     border: 1px solid #2a2f3a;
     border-radius: 10px;
     padding: 0.45rem 0.6rem;
+    min-width: 0;
 }
 
 .run-item-field span {
@@ -1167,6 +1187,8 @@
 .run-item-field strong {
     font-size: 0.9rem;
     font-weight: 600;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .run-item-actions {

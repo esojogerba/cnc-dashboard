@@ -52,7 +52,7 @@ function RunSummaryFilters({
                         <button
                             key={option.id}
                             type="button"
-                            className={`view-toggle-button${
+                            className={`view-toggle-button view-toggle-button-${option.id}${
                                 dataView === option.id ? " active" : ""
                             }`}
                             onClick={() => onDataViewChange(option.id)}
