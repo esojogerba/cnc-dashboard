@@ -423,7 +423,7 @@ const defaultRun = runDataById["run-0920"];
 
 const receiptStoragePrefix = "cnc-receipt:";
 const defaultRunFilters = {
-    minDiscount: "30",
+    minDiscount: "0",
     minFloor: "0",
     minBack: "0",
     aisle: "all",

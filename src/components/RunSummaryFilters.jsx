@@ -11,7 +11,7 @@ function RunSummaryFilters({
     aisleOptions,
     storeOptions,
     defaultFilters = {
-        minDiscount: "30",
+        minDiscount: "0",
         minFloor: "2",
         minBack: "2",
         aisle: "all",
@@ -73,7 +73,7 @@ function RunSummaryFilters({
                         step="1"
                         value={filters.minDiscount}
                         onChange={handleChange("minDiscount")}
-                        placeholder="30"
+                        placeholder="0"
                     />
                 </label>
                 <label className="filter-field">
