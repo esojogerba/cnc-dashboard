@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import cncLogo from '../assets/images/cnc_logo.png'
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -15,9 +16,7 @@ function Navbar() {
     <header className="top-nav">
       <div className="nav-bar">
         <div className="brand">
-          <span className="material-icons-outlined" aria-hidden="true">
-            smart_toy
-          </span>
+          <img src={cncLogo} alt="CNC Dashboard" />
         </div>
         <button
           className="nav-toggle"
