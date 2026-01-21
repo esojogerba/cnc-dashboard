@@ -1,0 +1,313 @@
+{
+    "botTypes": [
+        {
+            "id": "turbosearch",
+            "label": "TurboSearch",
+            "description": "TurboSearch scouter configuration",
+            "primaryFields": [
+                {
+                    "id": "accountId",
+                    "label": "Account ID",
+                    "type": "text",
+                    "placeholder": "Account ID",
+                    "defaultValue": "",
+                    "required": true
+                },
+                {
+                    "id": "tripName",
+                    "label": "Trip Name",
+                    "type": "text",
+                    "placeholder": "Trip YYYY-MM-DD",
+                    "defaultValue": "",
+                    "required": true
+                },
+                {
+                    "id": "discountPercent",
+                    "label": "Discount Percentage",
+                    "type": "number",
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "suffix": "%",
+                    "defaultValue": "50",
+                    "required": true
+                },
+                {
+                    "id": "alertThreshold",
+                    "label": "Alert Discount Threshold",
+                    "type": "number",
+                    "min": 0,
+                    "max": 100,
+                    "step": 1,
+                    "suffix": "%",
+                    "defaultValue": "65",
+                    "required": true
+                },
+                {
+                    "id": "alertEmail",
+                    "label": "Alert Email",
+                    "type": "email",
+                    "defaultValue": "cnc.onlinedeals@gmail.com",
+                    "required": true
+                }
+            ],
+            "linkFields": [
+                {
+                    "id": "savedListId",
+                    "label": "Saved Link List",
+                    "type": "savedList",
+                    "defaultValue": "",
+                    "fullWidth": true,
+                    "emptyLabel": "Select a saved list",
+                    "targetFieldId": "itemLinks"
+                },
+                {
+                    "id": "itemLinks",
+                    "label": "Item Links",
+                    "type": "textarea",
+                    "rows": 4,
+                    "placeholder": "Paste item links here, one per line.\nhttps://example.com/item-1",
+                    "defaultValue": "",
+                    "fullWidth": true,
+                    "required": true
+                }
+            ],
+            "devOptionalGroups": [
+                {
+                    "id": "core",
+                    "label": "Core run config",
+                    "fields": [
+                        {
+                            "id": "MAX_LINKS",
+                            "label": "MAX LINKS",
+                            "placeholder": "20",
+                            "type": "number",
+                            "defaultValue": "20"
+                        },
+                        {
+                            "id": "KEEP_OPEN",
+                            "label": "KEEP OPEN",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "state",
+                    "label": "Save/load login state",
+                    "fields": [
+                        {
+                            "id": "SAVE_MERGED_STATE",
+                            "label": "SAVE MERGED STATE",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        },
+                        {
+                            "id": "AUTO_LOGIN_SAVE_STATE",
+                            "label": "AUTO LOGIN SAVE STATE",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        },
+                        {
+                            "id": "AUTO_LOGIN_WAIT_MINUTES",
+                            "label": "AUTO LOGIN WAIT MINUTES",
+                            "placeholder": "5",
+                            "type": "number",
+                            "defaultValue": "5"
+                        }
+                    ]
+                },
+                {
+                    "id": "pages",
+                    "label": "GitHub Pages export",
+                    "fields": [
+                        {
+                            "id": "GITHUB_PAGES_EXPORT",
+                            "label": "GITHUB PAGES EXPORT",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        },
+                        {
+                            "id": "GITHUB_REPO_DIR",
+                            "label": "GITHUB REPO DIR",
+                            "placeholder": ".",
+                            "type": "text",
+                            "fullWidth": true,
+                            "defaultValue": "."
+                        },
+                        {
+                            "id": "GITHUB_PAGES_DIR",
+                            "label": "GITHUB PAGES DIR",
+                            "placeholder": "docs",
+                            "type": "text",
+                            "defaultValue": "docs"
+                        },
+                        {
+                            "id": "PUBLIC_SUMMARY_BASE_URL",
+                            "label": "PUBLIC SUMMARY BASE URL",
+                            "placeholder": "https://<user>.github.io/<repo>",
+                            "type": "url",
+                            "fullWidth": true
+                        }
+                    ]
+                },
+                {
+                    "id": "autopush",
+                    "label": "GitHub auto-push",
+                    "fields": [
+                        {
+                            "id": "GITHUB_AUTOPUSH",
+                            "label": "GITHUB AUTOPUSH",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        },
+                        {
+                            "id": "GITHUB_AUTOPUSH_MODE",
+                            "label": "GITHUB AUTOPUSH MODE",
+                            "placeholder": "pass",
+                            "type": "text",
+                            "defaultValue": "pass"
+                        },
+                        {
+                            "id": "GITHUB_AUTOPUSH_DEBOUNCE_MS",
+                            "label": "GITHUB AUTOPUSH DEBOUNCE MS",
+                            "placeholder": "60000",
+                            "type": "number",
+                            "defaultValue": "60000"
+                        },
+                        {
+                            "id": "GITHUB_AUTOPUSH_REMOTE",
+                            "label": "GITHUB AUTOPUSH REMOTE",
+                            "placeholder": "origin",
+                            "type": "text",
+                            "defaultValue": "origin"
+                        },
+                        {
+                            "id": "GITHUB_AUTOPUSH_BRANCH",
+                            "label": "GITHUB AUTOPUSH BRANCH",
+                            "placeholder": "main",
+                            "type": "text",
+                            "defaultValue": "main"
+                        }
+                    ]
+                },
+                {
+                    "id": "email",
+                    "label": "Email notifications",
+                    "fields": [
+                        {
+                            "id": "EMAIL_ON_FIRST_RESULT",
+                            "label": "EMAIL ON FIRST RESULT",
+                            "placeholder": "0",
+                            "type": "number",
+                            "defaultValue": "0"
+                        },
+                        {
+                            "id": "EMAIL_TO",
+                            "label": "EMAIL TO",
+                            "placeholder": "you@example.com",
+                            "type": "email"
+                        },
+                        {
+                            "id": "EMAIL_FROM",
+                            "label": "EMAIL FROM",
+                            "placeholder": "bot@example.com",
+                            "type": "email"
+                        },
+                        {
+                            "id": "EMAIL_FROM_NAME",
+                            "label": "EMAIL FROM NAME",
+                            "placeholder": "TurboSearch Bot",
+                            "type": "text"
+                        },
+                        {
+                            "id": "SMTP_HOST",
+                            "label": "SMTP HOST",
+                            "placeholder": "smtp.example.com",
+                            "type": "text"
+                        },
+                        {
+                            "id": "SMTP_PORT",
+                            "label": "SMTP PORT",
+                            "placeholder": "587",
+                            "type": "number",
+                            "defaultValue": "587"
+                        },
+                        {
+                            "id": "SMTP_SECURE",
+                            "label": "SMTP SECURE",
+                            "placeholder": "0",
+                            "type": "number",
+                            "defaultValue": "0"
+                        },
+                        {
+                            "id": "SMTP_USER",
+                            "label": "SMTP USER",
+                            "placeholder": "",
+                            "type": "text"
+                        },
+                        {
+                            "id": "SMTP_PASS",
+                            "label": "SMTP PASS",
+                            "placeholder": "",
+                            "type": "password",
+                            "fullWidth": true
+                        }
+                    ]
+                },
+                {
+                    "id": "alert",
+                    "label": "Discount alert email",
+                    "fields": [
+                        {
+                            "id": "ALERT_DEFAULT_QTY",
+                            "label": "ALERT DEFAULT QTY",
+                            "placeholder": "1",
+                            "type": "number",
+                            "defaultValue": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "sellerboard",
+                    "label": "Sellerboard COGS automation",
+                    "fields": [
+                        {
+                            "id": "SHEET_URL",
+                            "label": "SHEET URL",
+                            "placeholder": "https://docs.google.com/spreadsheets/d/<id>/edit?gid=0#gid=0",
+                            "type": "url",
+                            "fullWidth": true
+                        },
+                        {
+                            "id": "GOOGLE_SHEET_TAB",
+                            "label": "GOOGLE SHEET TAB",
+                            "placeholder": "Sheet1",
+                            "type": "text",
+                            "defaultValue": "Sheet1"
+                        },
+                        {
+                            "id": "GOOGLE_SHEET_RANGE_A1",
+                            "label": "GOOGLE SHEET RANGE A1",
+                            "placeholder": "Sheet1!A1:ZZ",
+                            "type": "text",
+                            "defaultValue": "Sheet1!A1:ZZ"
+                        },
+                        {
+                            "id": "GOOGLE_SERVICE_ACCOUNT_JSON",
+                            "label": "GOOGLE SERVICE ACCOUNT JSON",
+                            "placeholder": "/abs/path/to/service-account.json",
+                            "type": "text",
+                            "fullWidth": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

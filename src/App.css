@@ -31,7 +31,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 6px;
+    overflow: hidden;
     color: #ffffff;
+}
+
+.brand img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .nav-toggle {
@@ -389,6 +398,41 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem 1.4rem;
+}
+
+.bot-type-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.8rem;
+}
+
+.bot-type-row select {
+    flex: 1;
+    min-width: 0;
+}
+
+.bot-type-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.bot-type-button:hover,
+.bot-type-button:focus-visible {
+    background: #242b3a;
+    border-color: #3f4656;
+    color: #f0f2f7;
+}
+
+.bot-type-button .material-icons-outlined {
+    font-size: 18px;
+    text-transform: none;
+    letter-spacing: 0;
+    line-height: 1;
 }
 
 .form-field {
@@ -2016,6 +2060,11 @@
 
     .launch-form {
         grid-template-columns: 1fr;
+    }
+
+    .bot-type-row {
+        flex-direction: column;
+        align-items: stretch;
     }
 
     .run-filters {

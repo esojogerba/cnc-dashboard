@@ -3,6 +3,7 @@ import BotSection from "../components/BotSection";
 import RunsList from "../components/RunsList";
 import StatCard from "../components/StatCard";
 import StatToggleCard from "../components/StatToggleCard";
+import scouterBotTypes from "../data/scouter_bot_types.json";
 
 const itemsFound = { value: "69", note: "Today" };
 const profit = { value: "$1,260", note: "Net after fees" };
@@ -82,244 +83,6 @@ const runSummaries = [
         bought: 2,
     },
 ];
-const devOptionalGroups = [
-    {
-        id: "core",
-        label: "Core run config",
-        fields: [
-            {
-                id: "MAX_LINKS",
-                label: "MAX LINKS",
-                placeholder: "20",
-                type: "number",
-                defaultValue: "20",
-            },
-            {
-                id: "KEEP_OPEN",
-                label: "KEEP OPEN",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-        ],
-    },
-    {
-        id: "state",
-        label: "Save/load login state",
-        fields: [
-            {
-                id: "SAVE_MERGED_STATE",
-                label: "SAVE MERGED STATE",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-            {
-                id: "AUTO_LOGIN_SAVE_STATE",
-                label: "AUTO LOGIN SAVE STATE",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-            {
-                id: "AUTO_LOGIN_WAIT_MINUTES",
-                label: "AUTO LOGIN WAIT MINUTES",
-                placeholder: "5",
-                type: "number",
-                defaultValue: "5",
-            },
-        ],
-    },
-    {
-        id: "pages",
-        label: "GitHub Pages export",
-        fields: [
-            {
-                id: "GITHUB_PAGES_EXPORT",
-                label: "GITHUB PAGES EXPORT",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-            {
-                id: "GITHUB_REPO_DIR",
-                label: "GITHUB REPO DIR",
-                placeholder: ".",
-                type: "text",
-                fullWidth: true,
-                defaultValue: ".",
-            },
-            {
-                id: "GITHUB_PAGES_DIR",
-                label: "GITHUB PAGES DIR",
-                placeholder: "docs",
-                type: "text",
-                defaultValue: "docs",
-            },
-            {
-                id: "PUBLIC_SUMMARY_BASE_URL",
-                label: "PUBLIC SUMMARY BASE URL",
-                placeholder: "https://<user>.github.io/<repo>",
-                type: "url",
-                fullWidth: true,
-            },
-        ],
-    },
-    {
-        id: "autopush",
-        label: "GitHub auto-push",
-        fields: [
-            {
-                id: "GITHUB_AUTOPUSH",
-                label: "GITHUB AUTOPUSH",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-            {
-                id: "GITHUB_AUTOPUSH_MODE",
-                label: "GITHUB AUTOPUSH MODE",
-                placeholder: "pass",
-                type: "text",
-                defaultValue: "pass",
-            },
-            {
-                id: "GITHUB_AUTOPUSH_DEBOUNCE_MS",
-                label: "GITHUB AUTOPUSH DEBOUNCE MS",
-                placeholder: "60000",
-                type: "number",
-                defaultValue: "60000",
-            },
-            {
-                id: "GITHUB_AUTOPUSH_REMOTE",
-                label: "GITHUB AUTOPUSH REMOTE",
-                placeholder: "origin",
-                type: "text",
-                defaultValue: "origin",
-            },
-            {
-                id: "GITHUB_AUTOPUSH_BRANCH",
-                label: "GITHUB AUTOPUSH BRANCH",
-                placeholder: "main",
-                type: "text",
-                defaultValue: "main",
-            },
-        ],
-    },
-    {
-        id: "email",
-        label: "Email notifications",
-        fields: [
-            {
-                id: "EMAIL_ON_FIRST_RESULT",
-                label: "EMAIL ON FIRST RESULT",
-                placeholder: "0",
-                type: "number",
-                defaultValue: "0",
-            },
-            {
-                id: "EMAIL_TO",
-                label: "EMAIL TO",
-                placeholder: "you@example.com",
-                type: "email",
-            },
-            {
-                id: "EMAIL_FROM",
-                label: "EMAIL FROM",
-                placeholder: "bot@example.com",
-                type: "email",
-            },
-            {
-                id: "EMAIL_FROM_NAME",
-                label: "EMAIL FROM NAME",
-                placeholder: "TurboSearch Bot",
-                type: "text",
-            },
-            {
-                id: "SMTP_HOST",
-                label: "SMTP HOST",
-                placeholder: "smtp.example.com",
-                type: "text",
-            },
-            {
-                id: "SMTP_PORT",
-                label: "SMTP PORT",
-                placeholder: "587",
-                type: "number",
-                defaultValue: "587",
-            },
-            {
-                id: "SMTP_SECURE",
-                label: "SMTP SECURE",
-                placeholder: "0",
-                type: "number",
-                defaultValue: "0",
-            },
-            {
-                id: "SMTP_USER",
-                label: "SMTP USER",
-                placeholder: "",
-                type: "text",
-            },
-            {
-                id: "SMTP_PASS",
-                label: "SMTP PASS",
-                placeholder: "",
-                type: "password",
-                fullWidth: true,
-            },
-        ],
-    },
-    {
-        id: "alert",
-        label: "Discount alert email",
-        fields: [
-            {
-                id: "ALERT_DEFAULT_QTY",
-                label: "ALERT DEFAULT QTY",
-                placeholder: "1",
-                type: "number",
-                defaultValue: "1",
-            },
-        ],
-    },
-    {
-        id: "sellerboard",
-        label: "Sellerboard COGS automation",
-        fields: [
-            {
-                id: "SHEET_URL",
-                label: "SHEET URL",
-                placeholder:
-                    "https://docs.google.com/spreadsheets/d/<id>/edit?gid=0#gid=0",
-                type: "url",
-                fullWidth: true,
-            },
-            {
-                id: "GOOGLE_SHEET_TAB",
-                label: "GOOGLE SHEET TAB",
-                placeholder: "Sheet1",
-                type: "text",
-                defaultValue: "Sheet1",
-            },
-            {
-                id: "GOOGLE_SHEET_RANGE_A1",
-                label: "GOOGLE SHEET RANGE A1",
-                placeholder: "Sheet1!A1:ZZ",
-                type: "text",
-                defaultValue: "Sheet1!A1:ZZ",
-            },
-            {
-                id: "GOOGLE_SERVICE_ACCOUNT_JSON",
-                label: "GOOGLE SERVICE ACCOUNT JSON",
-                placeholder: "/abs/path/to/service-account.json",
-                type: "text",
-                fullWidth: true,
-            },
-        ],
-    },
-];
-const devOptionalFields = devOptionalGroups.flatMap((group) => group.fields);
 const scouterRows = [
     {
         id: "scout-1",
@@ -350,6 +113,23 @@ const scouterRows = [
     },
 ];
 
+const botTypes = scouterBotTypes?.botTypes ?? [];
+
+const buildBaseDefaults = (botType) => {
+    const defaults = {};
+    if (!botType) return defaults;
+    const fields = [
+        ...(botType.primaryFields || []),
+        ...(botType.linkFields || []),
+    ];
+    fields.forEach((field) => {
+        if (!field?.id) return;
+        defaults[field.id] =
+            field.defaultValue != null ? String(field.defaultValue) : "";
+    });
+    return defaults;
+};
+
 function Scouters() {
     const [runMode, setRunMode] = useState("normal");
     const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
@@ -358,16 +138,26 @@ function Scouters() {
     const addFieldMenuRef = useRef(null);
     const [optionalFieldIds, setOptionalFieldIds] = useState([]);
     const [optionalFieldValues, setOptionalFieldValues] = useState({});
-    const [accountId, setAccountId] = useState("");
-    const [tripName, setTripName] = useState("");
-    const [discountPercent, setDiscountPercent] = useState("50");
-    const [alertThreshold, setAlertThreshold] = useState("65");
-    const [alertEmail, setAlertEmail] = useState("cnc.onlinedeals@gmail.com");
-    const [itemLinks, setItemLinks] = useState("");
-    const [selectedListId, setSelectedListId] = useState("");
+    const initialBotType = botTypes[0] || null;
+    const [selectedBotTypeId, setSelectedBotTypeId] = useState(
+        () => initialBotType?.id ?? ""
+    );
+    const [formValues, setFormValues] = useState(() =>
+        buildBaseDefaults(initialBotType)
+    );
     const modeLabel = runMode === "dev" ? "Dev Mode" : "Normal Mode";
     const modeDescription =
         runMode === "dev" ? "Dev run configuration" : "Normal run configuration";
+    const activeBotType =
+        botTypes.find((botType) => botType.id === selectedBotTypeId) ||
+        initialBotType;
+    const primaryFields = activeBotType?.primaryFields ?? [];
+    const linkFields = activeBotType?.linkFields ?? [];
+    const baseFields = [...primaryFields, ...linkFields];
+    const devOptionalGroups = activeBotType?.devOptionalGroups ?? [];
+    const devOptionalFields = devOptionalGroups.flatMap(
+        (group) => group.fields || []
+    );
 
     useEffect(() => {
         if (!isModeMenuOpen) return;
@@ -403,14 +193,28 @@ function Scouters() {
         }
     }, [runMode]);
 
-    const handleListChange = (event) => {
-        const listId = event.target.value;
-        setSelectedListId(listId);
+    useEffect(() => {
+        setFormValues(buildBaseDefaults(activeBotType));
+        setOptionalFieldIds([]);
+        setOptionalFieldValues({});
+        setIsAddFieldMenuOpen(false);
+    }, [activeBotType?.id]);
 
+    const handleFieldChange = (fieldId) => (event) => {
+        const value = event.target.value;
+        setFormValues((prev) => ({ ...prev, [fieldId]: value }));
+    };
+
+    const handleListChange = (field) => (event) => {
+        const listId = event.target.value;
         const selectedList = savedLists.find((list) => list.id === listId);
-        if (selectedList) {
-            setItemLinks(selectedList.links.join("\n"));
-        }
+        setFormValues((prev) => {
+            const next = { ...prev, [field.id]: listId };
+            if (selectedList && field.targetFieldId) {
+                next[field.targetFieldId] = selectedList.links.join("\n");
+            }
+            return next;
+        });
     };
 
     const handleOptionalFieldChange = (fieldId) => (event) => {
@@ -453,18 +257,93 @@ function Scouters() {
     };
     const isOptionalFieldFilled = (field) =>
         String(getOptionalFieldValue(field) ?? "").trim().length > 0;
-    const baseReady =
-        accountId.trim().length > 0 &&
-        tripName.trim().length > 0 &&
-        itemLinks.trim().length > 0 &&
-        alertEmail.trim().length > 0 &&
-        discountPercent.trim().length > 0 &&
-        alertThreshold.trim().length > 0;
+    const isRequiredFieldFilled = (field) => {
+        if (!field?.required) return true;
+        return String(formValues[field.id] ?? "").trim().length > 0;
+    };
+    const baseReady = activeBotType
+        ? baseFields.every((field) => isRequiredFieldFilled(field))
+        : false;
     const optionalReady =
         runMode === "dev"
             ? addedOptionalFields.every((field) => isOptionalFieldFilled(field))
             : true;
     const isReadyToRun = baseReady && optionalReady;
+
+    const renderBaseField = (field) => {
+        if (!field?.id) return null;
+        const value = formValues[field.id] ?? "";
+        const fieldClassName = `form-field${
+            field.fullWidth ? " field-span-2" : ""
+        }`;
+
+        if (field.type === "savedList") {
+            return (
+                <label key={field.id} className={fieldClassName}>
+                    <span>{field.label}</span>
+                    <select
+                        value={value}
+                        onChange={handleListChange(field)}
+                        required={field.required}
+                    >
+                        <option value="">
+                            {field.emptyLabel || "Select a saved list"}
+                        </option>
+                        {savedLists.map((list) => (
+                            <option key={list.id} value={list.id}>
+                                {list.name}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+            );
+        }
+
+        if (field.type === "textarea") {
+            return (
+                <label key={field.id} className={fieldClassName}>
+                    <span>{field.label}</span>
+                    <textarea
+                        rows={field.rows || 4}
+                        placeholder={field.placeholder || ""}
+                        value={value}
+                        onChange={handleFieldChange(field.id)}
+                        required={field.required}
+                    />
+                </label>
+            );
+        }
+
+        const inputProps = {
+            type: field.type || "text",
+            placeholder: field.placeholder || "",
+            value,
+            onChange: handleFieldChange(field.id),
+            required: field.required,
+        };
+        if (field.min != null) inputProps.min = field.min;
+        if (field.max != null) inputProps.max = field.max;
+        if (field.step != null) inputProps.step = field.step;
+
+        if (field.suffix) {
+            return (
+                <label key={field.id} className={fieldClassName}>
+                    <span>{field.label}</span>
+                    <div className="input-suffix">
+                        <input {...inputProps} />
+                        <span>{field.suffix}</span>
+                    </div>
+                </label>
+            );
+        }
+
+        return (
+            <label key={field.id} className={fieldClassName}>
+                <span>{field.label}</span>
+                <input {...inputProps} />
+            </label>
+        );
+    };
 
     return (
         <main className="dashboard scouters-page">
@@ -588,75 +467,46 @@ function Scouters() {
                     className="launch-form"
                     onSubmit={(event) => event.preventDefault()}
                 >
-                    <label className="form-field">
-                        <span>Account ID</span>
-                        <input
-                            type="text"
-                            placeholder="Account ID"
-                            value={accountId}
-                            onChange={(event) =>
-                                setAccountId(event.target.value)
-                            }
-                            required
-                        />
-                    </label>
-                    <label className="form-field">
-                        <span>Trip Name</span>
-                        <input
-                            type="text"
-                            placeholder="Trip YYYY-MM-DD"
-                            value={tripName}
-                            onChange={(event) =>
-                                setTripName(event.target.value)
-                            }
-                            required
-                        />
-                    </label>
-                    <label className="form-field">
-                        <span>Discount Percentage</span>
-                        <div className="input-suffix">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="1"
-                                value={discountPercent}
+                    <label className="form-field field-span-2 bot-type-field">
+                        <span>Bot Type</span>
+                        <div className="bot-type-row">
+                            <select
+                                value={selectedBotTypeId}
                                 onChange={(event) =>
-                                    setDiscountPercent(event.target.value)
+                                    setSelectedBotTypeId(event.target.value)
                                 }
-                                required
-                            />
-                            <span>%</span>
+                                disabled={!botTypes.length}
+                            >
+                                {botTypes.length ? (
+                                    botTypes.map((botType) => (
+                                        <option
+                                            key={botType.id}
+                                            value={botType.id}
+                                        >
+                                            {botType.label}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="">
+                                        No bot types available
+                                    </option>
+                                )}
+                            </select>
+                            <button
+                                className="ghost-button bot-type-button"
+                                type="button"
+                            >
+                                <span
+                                    className="material-icons-outlined"
+                                    aria-hidden="true"
+                                >
+                                    add
+                                </span>
+                                <span>New Bot Type</span>
+                            </button>
                         </div>
                     </label>
-                    <label className="form-field">
-                        <span>Alert Discount Threshold</span>
-                        <div className="input-suffix">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="1"
-                                value={alertThreshold}
-                                onChange={(event) =>
-                                    setAlertThreshold(event.target.value)
-                                }
-                                required
-                            />
-                            <span>%</span>
-                        </div>
-                    </label>
-                    <label className="form-field">
-                        <span>Alert Email</span>
-                        <input
-                            type="email"
-                            value={alertEmail}
-                            onChange={(event) =>
-                                setAlertEmail(event.target.value)
-                            }
-                            required
-                        />
-                    </label>
+                    {primaryFields.map((field) => renderBaseField(field))}
                     {runMode === "dev"
                         ? addedOptionalFields.map((field) => (
                               <label
@@ -763,32 +613,7 @@ function Scouters() {
                             </div>
                         </div>
                     ) : null}
-                    <label className="form-field field-span-2">
-                        <span>Saved Link List</span>
-                        <select
-                            value={selectedListId}
-                            onChange={handleListChange}
-                        >
-                            <option value="">Select a saved list</option>
-                            {savedLists.map((list) => (
-                                <option key={list.id} value={list.id}>
-                                    {list.name}
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <label className="form-field field-span-2">
-                        <span>Item Links</span>
-                        <textarea
-                            rows="4"
-                            placeholder={`Paste item links here, one per line.\nhttps://example.com/item-1`}
-                            value={itemLinks}
-                            onChange={(event) =>
-                                setItemLinks(event.target.value)
-                            }
-                            required
-                        />
-                    </label>
+                    {linkFields.map((field) => renderBaseField(field))}
                     <div className="launch-actions">
                         <button
                             className="run-button"
