@@ -358,6 +358,7 @@ function Scouters() {
     const addFieldMenuRef = useRef(null);
     const [optionalFieldIds, setOptionalFieldIds] = useState([]);
     const [optionalFieldValues, setOptionalFieldValues] = useState({});
+    const [accountId, setAccountId] = useState("");
     const [tripName, setTripName] = useState("");
     const [discountPercent, setDiscountPercent] = useState("50");
     const [alertThreshold, setAlertThreshold] = useState("65");
@@ -453,6 +454,7 @@ function Scouters() {
     const isOptionalFieldFilled = (field) =>
         String(getOptionalFieldValue(field) ?? "").trim().length > 0;
     const baseReady =
+        accountId.trim().length > 0 &&
         tripName.trim().length > 0 &&
         itemLinks.trim().length > 0 &&
         alertEmail.trim().length > 0 &&
@@ -586,6 +588,18 @@ function Scouters() {
                     className="launch-form"
                     onSubmit={(event) => event.preventDefault()}
                 >
+                    <label className="form-field">
+                        <span>Account ID</span>
+                        <input
+                            type="text"
+                            placeholder="Account ID"
+                            value={accountId}
+                            onChange={(event) =>
+                                setAccountId(event.target.value)
+                            }
+                            required
+                        />
+                    </label>
                     <label className="form-field">
                         <span>Trip Name</span>
                         <input
