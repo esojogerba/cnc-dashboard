@@ -51,6 +51,7 @@
                     "required": true
                 }
             ],
+            "devFields": [],
             "linkFields": [
                 {
                     "id": "savedListId",

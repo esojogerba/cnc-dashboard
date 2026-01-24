@@ -113,7 +113,85 @@ const scouterRows = [
     },
 ];
 
-const botTypes = scouterBotTypes?.botTypes ?? [];
+const botTypesStorageKey = "cnc:scouter-bot-types";
+const baseBotTypes = scouterBotTypes?.botTypes ?? [];
+const baseBotTypeIds = new Set(baseBotTypes.map((botType) => botType.id));
+const baseBotTypeMap = new Map(
+    baseBotTypes.map((botType) => [botType.id, botType])
+);
+
+const loadCustomBotTypes = () => {
+    if (typeof window === "undefined") return [];
+    try {
+        const raw = localStorage.getItem(botTypesStorageKey);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+};
+
+const mergeBotTypes = (base, custom) => {
+    const map = new Map();
+    base.forEach((botType) => {
+        if (!botType?.id) return;
+        map.set(botType.id, botType);
+    });
+    custom.forEach((botType) => {
+        if (!botType?.id) return;
+        map.set(botType.id, botType);
+    });
+    return Array.from(map.values());
+};
+
+const normalizeBotType = (botType) => ({
+    id: botType?.id || "",
+    label: botType?.label || "",
+    description: botType?.description || "",
+    primaryFields: botType?.primaryFields || [],
+    devFields: botType?.devFields || [],
+    linkFields: botType?.linkFields || [],
+    devOptionalGroups: botType?.devOptionalGroups || [],
+});
+
+const isSameBotType = (left, right) =>
+    JSON.stringify(normalizeBotType(left)) ===
+    JSON.stringify(normalizeBotType(right));
+
+const persistCustomBotTypes = (allBotTypes) => {
+    if (typeof window === "undefined") return;
+    const customBotTypes = allBotTypes.filter((botType) => {
+        if (!botType?.id) return false;
+        if (!baseBotTypeIds.has(botType.id)) return true;
+        const baseBotType = baseBotTypeMap.get(botType.id);
+        if (!baseBotType) return true;
+        return !isSameBotType(botType, baseBotType);
+    });
+    try {
+        localStorage.setItem(botTypesStorageKey, JSON.stringify(customBotTypes));
+    } catch (error) {
+        // Ignore storage failures (private mode, quota, etc).
+    }
+};
+
+const slugify = (value) =>
+    value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+
+const makeUniqueId = (baseId, existingIds, fallback = "bot") => {
+    const safeBase = baseId || fallback;
+    let nextId = safeBase;
+    let counter = 2;
+    while (existingIds.has(nextId)) {
+        nextId = `${safeBase}-${counter}`;
+        counter += 1;
+    }
+    return nextId;
+};
 
 const buildBaseDefaults = (botType) => {
     const defaults = {};
@@ -130,6 +208,20 @@ const buildBaseDefaults = (botType) => {
     return defaults;
 };
 
+const buildFieldDefinition = (name, defaultValue, existingIds) => {
+    const label = name.trim();
+    const baseId = slugify(label);
+    const id = makeUniqueId(baseId, existingIds, "field");
+    return {
+        id,
+        label,
+        type: "text",
+        placeholder: label,
+        defaultValue: defaultValue != null ? String(defaultValue) : "",
+        required: true,
+    };
+};
+
 function Scouters() {
     const [runMode, setRunMode] = useState("normal");
     const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
@@ -138,22 +230,50 @@ function Scouters() {
     const addFieldMenuRef = useRef(null);
     const [optionalFieldIds, setOptionalFieldIds] = useState([]);
     const [optionalFieldValues, setOptionalFieldValues] = useState({});
-    const initialBotType = botTypes[0] || null;
-    const [selectedBotTypeId, setSelectedBotTypeId] = useState(
-        () => initialBotType?.id ?? ""
+    const [botTypeOptions, setBotTypeOptions] = useState(() =>
+        mergeBotTypes(baseBotTypes, loadCustomBotTypes())
     );
-    const [formValues, setFormValues] = useState(() =>
-        buildBaseDefaults(initialBotType)
-    );
+    const [selectedBotTypeId, setSelectedBotTypeId] = useState(() => {
+        const initialBotTypes = mergeBotTypes(
+            baseBotTypes,
+            loadCustomBotTypes()
+        );
+        return initialBotTypes[0]?.id ?? "";
+    });
+    const [formValues, setFormValues] = useState(() => {
+        const initialBotTypes = mergeBotTypes(
+            baseBotTypes,
+            loadCustomBotTypes()
+        );
+        return buildBaseDefaults(initialBotTypes[0] || null);
+    });
+    const [isBotTypeModalOpen, setIsBotTypeModalOpen] = useState(false);
+    const [isEditingBotType, setIsEditingBotType] = useState(false);
+    const [editingBotTypeId, setEditingBotTypeId] = useState(null);
+    const [botTypeName, setBotTypeName] = useState("");
+    const [normalInputs, setNormalInputs] = useState([]);
+    const [devInputs, setDevInputs] = useState([]);
+    const [isAddingNormalInput, setIsAddingNormalInput] = useState(false);
+    const [isAddingDevInput, setIsAddingDevInput] = useState(false);
+    const [normalInputDraft, setNormalInputDraft] = useState({
+        name: "",
+        defaultValue: "",
+    });
+    const [devInputDraft, setDevInputDraft] = useState({
+        name: "",
+        defaultValue: "",
+    });
     const modeLabel = runMode === "dev" ? "Dev Mode" : "Normal Mode";
     const modeDescription =
         runMode === "dev" ? "Dev run configuration" : "Normal run configuration";
     const activeBotType =
-        botTypes.find((botType) => botType.id === selectedBotTypeId) ||
-        initialBotType;
+        botTypeOptions.find((botType) => botType.id === selectedBotTypeId) ||
+        botTypeOptions[0] ||
+        null;
     const primaryFields = activeBotType?.primaryFields ?? [];
     const linkFields = activeBotType?.linkFields ?? [];
-    const baseFields = [...primaryFields, ...linkFields];
+    const displayFields = primaryFields;
+    const baseFields = [...displayFields, ...linkFields];
     const devOptionalGroups = activeBotType?.devOptionalGroups ?? [];
     const devOptionalFields = devOptionalGroups.flatMap(
         (group) => group.fields || []
@@ -194,11 +314,36 @@ function Scouters() {
     }, [runMode]);
 
     useEffect(() => {
+        if (!botTypeOptions.length) return;
+        const hasSelection = botTypeOptions.some(
+            (botType) => botType.id === selectedBotTypeId
+        );
+        if (!hasSelection) {
+            setSelectedBotTypeId(botTypeOptions[0].id);
+        }
+    }, [botTypeOptions, selectedBotTypeId]);
+
+    useEffect(() => {
+        persistCustomBotTypes(botTypeOptions);
+    }, [botTypeOptions]);
+
+    useEffect(() => {
         setFormValues(buildBaseDefaults(activeBotType));
         setOptionalFieldIds([]);
         setOptionalFieldValues({});
         setIsAddFieldMenuOpen(false);
     }, [activeBotType?.id]);
+
+    useEffect(() => {
+        if (!isBotTypeModalOpen) return;
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                setIsBotTypeModalOpen(false);
+            }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isBotTypeModalOpen]);
 
     const handleFieldChange = (fieldId) => (event) => {
         const value = event.target.value;
@@ -242,6 +387,144 @@ function Scouters() {
             }
             return prev;
         });
+    };
+
+    const resetBotTypeDraft = () => {
+        setBotTypeName("");
+        setNormalInputs([]);
+        setDevInputs([]);
+        setIsAddingNormalInput(false);
+        setIsAddingDevInput(false);
+        setNormalInputDraft({ name: "", defaultValue: "" });
+        setDevInputDraft({ name: "", defaultValue: "" });
+        setIsEditingBotType(false);
+        setEditingBotTypeId(null);
+    };
+
+    const handleOpenBotTypeModal = () => {
+        resetBotTypeDraft();
+        setIsBotTypeModalOpen(true);
+    };
+
+    const handleOpenEditBotTypeModal = () => {
+        if (!activeBotType) return;
+        const nextNormalInputs = (activeBotType.primaryFields || []).map(
+            (field) => ({ ...field })
+        );
+        const devFieldsFromGroups = (
+            activeBotType.devOptionalGroups || []
+        ).flatMap((group) => group.fields || []);
+        const nextDevInputs = devFieldsFromGroups.map((field) => ({
+            ...field,
+        }));
+        setBotTypeName(activeBotType.label || "");
+        setNormalInputs(nextNormalInputs);
+        setDevInputs(nextDevInputs);
+        setIsAddingNormalInput(false);
+        setIsAddingDevInput(false);
+        setNormalInputDraft({ name: "", defaultValue: "" });
+        setDevInputDraft({ name: "", defaultValue: "" });
+        setIsEditingBotType(true);
+        setEditingBotTypeId(activeBotType.id);
+        setIsBotTypeModalOpen(true);
+    };
+
+    const handleCloseBotTypeModal = () => {
+        setIsBotTypeModalOpen(false);
+    };
+
+    const allDraftInputs = [...normalInputs, ...devInputs];
+    const existingFieldIds = new Set(allDraftInputs.map((field) => field.id));
+    const existingFieldNames = new Set(
+        allDraftInputs.map((field) => (field.label || "").toLowerCase())
+    );
+    const trimmedBotTypeName = botTypeName.trim();
+    const normalizedBotTypeName = trimmedBotTypeName.toLowerCase();
+    const botTypeNameTaken = botTypeOptions.some(
+        (botType) =>
+            botType.label?.toLowerCase() === normalizedBotTypeName &&
+            botType.id !== editingBotTypeId
+    );
+    const canSaveBotType =
+        trimmedBotTypeName.length > 0 &&
+        normalInputs.length > 0 &&
+        !botTypeNameTaken;
+    const canAddNormalInput =
+        normalInputDraft.name.trim().length > 0 &&
+        !existingFieldNames.has(normalInputDraft.name.trim().toLowerCase());
+    const canAddDevInput =
+        devInputDraft.name.trim().length > 0 &&
+        !existingFieldNames.has(devInputDraft.name.trim().toLowerCase());
+
+    const handleAddNormalInput = () => {
+        if (!canAddNormalInput) return;
+        const field = buildFieldDefinition(
+            normalInputDraft.name,
+            normalInputDraft.defaultValue,
+            existingFieldIds
+        );
+        setNormalInputs((prev) => [...prev, field]);
+        setNormalInputDraft({ name: "", defaultValue: "" });
+        setIsAddingNormalInput(false);
+    };
+
+    const handleAddDevInput = () => {
+        if (!canAddDevInput) return;
+        const field = buildFieldDefinition(
+            devInputDraft.name,
+            devInputDraft.defaultValue,
+            existingFieldIds
+        );
+        setDevInputs((prev) => [...prev, field]);
+        setDevInputDraft({ name: "", defaultValue: "" });
+        setIsAddingDevInput(false);
+    };
+
+    const handleRemoveNormalInput = (fieldId) => {
+        setNormalInputs((prev) => prev.filter((field) => field.id !== fieldId));
+    };
+
+    const handleRemoveDevInput = (fieldId) => {
+        setDevInputs((prev) => prev.filter((field) => field.id !== fieldId));
+    };
+
+    const handleSaveBotType = () => {
+        if (!canSaveBotType) return;
+        const existingBotTypeIds = new Set(
+            botTypeOptions.map((botType) => botType.id)
+        );
+        const baseId = slugify(trimmedBotTypeName);
+        const id = isEditingBotType
+            ? editingBotTypeId
+            : makeUniqueId(baseId, existingBotTypeIds);
+        const currentDescription =
+            botTypeOptions.find((botType) => botType.id === id)?.description ||
+            `${trimmedBotTypeName} scouter configuration`;
+        const nextBotType = {
+            id,
+            label: trimmedBotTypeName,
+            description: currentDescription,
+            primaryFields: normalInputs,
+            linkFields: [],
+            devFields: [],
+            devOptionalGroups: devInputs.length
+                ? [
+                      {
+                          id: "custom-dev-inputs",
+                          label: "Dev Mode Inputs",
+                          fields: devInputs,
+                      },
+                  ]
+                : [],
+        };
+        const nextBotTypes = isEditingBotType
+            ? botTypeOptions.map((botType) =>
+                  botType.id === id ? nextBotType : botType
+              )
+            : [...botTypeOptions, nextBotType];
+        setBotTypeOptions(nextBotTypes);
+        setSelectedBotTypeId(id);
+        setIsBotTypeModalOpen(false);
     };
 
     const addedOptionalFields = optionalFieldIds
@@ -475,10 +758,10 @@ function Scouters() {
                                 onChange={(event) =>
                                     setSelectedBotTypeId(event.target.value)
                                 }
-                                disabled={!botTypes.length}
+                                disabled={!botTypeOptions.length}
                             >
-                                {botTypes.length ? (
-                                    botTypes.map((botType) => (
+                                {botTypeOptions.length ? (
+                                    botTypeOptions.map((botType) => (
                                         <option
                                             key={botType.id}
                                             value={botType.id}
@@ -493,8 +776,25 @@ function Scouters() {
                                 )}
                             </select>
                             <button
+                                className="ghost-button bot-type-edit-button"
+                                type="button"
+                                onClick={handleOpenEditBotTypeModal}
+                                aria-label="Edit bot type"
+                                disabled={!activeBotType}
+                            >
+                                <span
+                                    className="material-icons-outlined"
+                                    aria-hidden="true"
+                                >
+                                    edit
+                                </span>
+                            </button>
+                            <button
                                 className="ghost-button bot-type-button"
                                 type="button"
+                                onClick={handleOpenBotTypeModal}
+                                aria-haspopup="dialog"
+                                aria-expanded={isBotTypeModalOpen}
                             >
                                 <span
                                     className="material-icons-outlined"
@@ -506,7 +806,7 @@ function Scouters() {
                             </button>
                         </div>
                     </label>
-                    {primaryFields.map((field) => renderBaseField(field))}
+                    {displayFields.map((field) => renderBaseField(field))}
                     {runMode === "dev"
                         ? addedOptionalFields.map((field) => (
                               <label
@@ -527,7 +827,7 @@ function Scouters() {
                               </label>
                           ))
                         : null}
-                    {runMode === "dev" ? (
+                    {runMode === "dev" && devOptionalGroups.length ? (
                         <div className="form-field field-span-2 add-field-row">
                             <span>Add Optional Field</span>
                             <div className="add-field" ref={addFieldMenuRef}>
@@ -638,6 +938,290 @@ function Scouters() {
                 </div>
                 <RunsList runs={runSummaries} />
             </section>
+            {isBotTypeModalOpen ? (
+                <div
+                    className="bot-type-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Create new bot type"
+                    onClick={handleCloseBotTypeModal}
+                >
+                    <div
+                        className="bot-type-modal-card"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="bot-type-modal-header">
+                            <div>
+                                <h3 className="bot-type-modal-title">
+                                    {isEditingBotType
+                                        ? "Edit Bot Type"
+                                        : "New Bot Type"}
+                                </h3>
+                                <p className="bot-type-modal-subtitle">
+                                    {isEditingBotType
+                                        ? "Update the inputs for this scouter configuration."
+                                        : "Define the inputs for this scouter configuration."}
+                                </p>
+                            </div>
+                            <button
+                                className="ghost-button icon-button"
+                                type="button"
+                                onClick={handleCloseBotTypeModal}
+                                aria-label="Close"
+                            >
+                                <span
+                                    className="material-icons-round"
+                                    aria-hidden="true"
+                                >
+                                    close
+                                </span>
+                            </button>
+                        </div>
+                        <label className="form-field">
+                            <span>Bot Name</span>
+                            <input
+                                type="text"
+                                placeholder="New bot name"
+                                value={botTypeName}
+                                onChange={(event) =>
+                                    setBotTypeName(event.target.value)
+                                }
+                                required
+                            />
+                        </label>
+                        {trimmedBotTypeName.length > 0 && botTypeNameTaken ? (
+                            <p className="bot-type-warning">
+                                A bot type with this name already exists.
+                            </p>
+                        ) : null}
+                        <div className="bot-type-sections">
+                            <div className="bot-type-section">
+                                <div className="bot-type-section-header">
+                                    <h4>Normal Mode</h4>
+                                    <p>Inputs used for standard runs.</p>
+                                </div>
+                                <div className="bot-type-input-list">
+                                    {normalInputs.length ? (
+                                        normalInputs.map((field) => {
+                                            const defaultValue = String(
+                                                field.defaultValue ?? ""
+                                            ).trim();
+                                            return (
+                                                <div
+                                                    key={field.id}
+                                                    className="bot-type-input-item"
+                                                >
+                                                    <span className="bot-type-input-name">
+                                                        {field.label}
+                                                    </span>
+                                                    <span className="bot-type-input-default">
+                                                        {defaultValue.length
+                                                            ? `Default: ${defaultValue}`
+                                                            : "Default: None"}
+                                                    </span>
+                                                    <button
+                                                        className="bot-type-remove"
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleRemoveNormalInput(
+                                                                field.id
+                                                            )
+                                                        }
+                                                        aria-label={`Remove ${field.label}`}
+                                                    >
+                                                        <span
+                                                            className="material-icons-round"
+                                                            aria-hidden="true"
+                                                        >
+                                                            close
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="bot-type-empty">
+                                            No inputs added yet.
+                                        </p>
+                                    )}
+                                </div>
+                                {isAddingNormalInput ? (
+                                    <div className="bot-type-input-form">
+                                        <input
+                                            type="text"
+                                            placeholder="Input name"
+                                            value={normalInputDraft.name}
+                                            onChange={(event) =>
+                                                setNormalInputDraft((prev) => ({
+                                                    ...prev,
+                                                    name: event.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Default value (optional)"
+                                            value={normalInputDraft.defaultValue}
+                                            onChange={(event) =>
+                                                setNormalInputDraft((prev) => ({
+                                                    ...prev,
+                                                    defaultValue:
+                                                        event.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <button
+                                            className="ghost-button bot-type-input-done"
+                                            type="button"
+                                            onClick={handleAddNormalInput}
+                                            disabled={!canAddNormalInput}
+                                        >
+                                            Done
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        className="ghost-button bot-type-add-button"
+                                        type="button"
+                                        onClick={() =>
+                                            setIsAddingNormalInput(true)
+                                        }
+                                    >
+                                        <span
+                                            className="material-icons-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            add
+                                        </span>
+                                        <span>Add new input</span>
+                                    </button>
+                                )}
+                            </div>
+                            <div className="bot-type-section">
+                                <div className="bot-type-section-header">
+                                    <h4>Dev Mode</h4>
+                                    <p>
+                                        Inputs only used for dev runs.
+                                    </p>
+                                </div>
+                                <div className="bot-type-input-list">
+                                    {devInputs.length ? (
+                                        devInputs.map((field) => {
+                                            const defaultValue = String(
+                                                field.defaultValue ?? ""
+                                            ).trim();
+                                            return (
+                                                <div
+                                                    key={field.id}
+                                                    className="bot-type-input-item"
+                                                >
+                                                    <span className="bot-type-input-name">
+                                                        {field.label}
+                                                    </span>
+                                                    <span className="bot-type-input-default">
+                                                        {defaultValue.length
+                                                            ? `Default: ${defaultValue}`
+                                                            : "Default: None"}
+                                                    </span>
+                                                    <button
+                                                        className="bot-type-remove"
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleRemoveDevInput(
+                                                                field.id
+                                                            )
+                                                        }
+                                                        aria-label={`Remove ${field.label}`}
+                                                    >
+                                                        <span
+                                                            className="material-icons-round"
+                                                            aria-hidden="true"
+                                                        >
+                                                            close
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            );
+                                        })
+                                    ) : (
+                                        <p className="bot-type-empty">
+                                            No inputs added yet.
+                                        </p>
+                                    )}
+                                </div>
+                                {isAddingDevInput ? (
+                                    <div className="bot-type-input-form">
+                                        <input
+                                            type="text"
+                                            placeholder="Input name"
+                                            value={devInputDraft.name}
+                                            onChange={(event) =>
+                                                setDevInputDraft((prev) => ({
+                                                    ...prev,
+                                                    name: event.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Default value (optional)"
+                                            value={devInputDraft.defaultValue}
+                                            onChange={(event) =>
+                                                setDevInputDraft((prev) => ({
+                                                    ...prev,
+                                                    defaultValue:
+                                                        event.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <button
+                                            className="ghost-button bot-type-input-done"
+                                            type="button"
+                                            onClick={handleAddDevInput}
+                                            disabled={!canAddDevInput}
+                                        >
+                                            Done
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        className="ghost-button bot-type-add-button"
+                                        type="button"
+                                        onClick={() =>
+                                            setIsAddingDevInput(true)
+                                        }
+                                    >
+                                        <span
+                                            className="material-icons-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            add
+                                        </span>
+                                        <span>Add new input</span>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        <div className="bot-type-modal-actions">
+                            <button
+                                className="ghost-button"
+                                type="button"
+                                onClick={handleCloseBotTypeModal}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="run-button"
+                                type="button"
+                                onClick={handleSaveBotType}
+                                disabled={!canSaveBotType}
+                            >
+                                {isEditingBotType ? "Save" : "Done"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : null}
         </main>
     );
 }
